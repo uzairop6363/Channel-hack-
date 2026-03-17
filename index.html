@@ -2,234 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MCR PRO">
-    
-    <title>MCR PRO ADAPTIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C9 UZAIR - System</title>
     <style>
-        :root { --bg: #050505; --panel: #111; --danger: #ff0000; --pvw: #00ff00; --accent: #f1c40f; }
-        
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent;
-            /* Prevents the toolbar from triggering on most clicks */
-            touch-action: manipulation; 
+        :root {
+            --primary: #00ff41;
+            --bg: #050505;
+            --card: #111;
+            --danger: #ff3e3e;
+            --accent: #0088ff;
         }
-        
-        body { 
-            background: var(--bg); 
-            color: #fff; 
-            margin: 0; 
-            font-family: 'Segoe UI', sans-serif; 
-            overflow: hidden; /* Lock scroll to prevent bar popping */
-            height: 100vh;
-            /* New iOS Fix for height */
-            height: 100svh; 
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Consolas', monospace;
             display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 380px;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.1);
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); letter-spacing: 4px; margin-bottom: 20px; }
+
+        .input-box {
+            width: 90%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid #444;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        #terminal {
+            background: #000;
+            height: 150px;
+            text-align: left;
+            padding: 10px;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            border: 1px solid #222;
+            margin-bottom: 15px;
+        }
+
+        .status-area {
+            height: 30px;
+            margin: 10px 0;
+            font-weight: bold;
+            display: none; /* Initially Hidden */
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-main { background: var(--primary); color: #000; }
+        .btn-sec { background: #333; color: #fff; }
+        .btn-login { background: var(--accent); color: white; display: none; width: 100%; }
+
+        /* Second Screen Styles */
+        #second-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
             flex-direction: column;
         }
 
-        /* Initial Loader */
-        #app-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .spin { width: 40px; height: 40px; border: 4px solid #333; border-top-color: var(--danger); border-radius: 50%; animation: s 1s linear infinite; }
-        @keyframes s { to { transform: rotate(360deg); } }
-
-        .container { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%;
-            width: 100%;
-            padding-bottom: env(safe-area-inset-bottom); /* iOS Notch/Bar Fix */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            width: 320px;
         }
 
-        .header { height: 40px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 2px solid #333; font-size: 12px; flex-shrink: 0; }
-
-        .monitor-wall { 
-            display: grid; 
-            grid-template-columns: 220px 1fr; 
-            gap: 10px; 
+        .cost-msg {
+            color: #ffcc00;
+            margin-top: 20px;
+            display: none;
+            font-size: 1.2rem;
+            border: 1px dashed #ffcc00;
             padding: 10px;
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .side-panel { display: grid; grid-template-rows: repeat(3, 1fr) 80px; gap: 8px; }
-        .mon { background: #000; border: 1px solid #444; position: relative; overflow: hidden; border-radius: 4px; }
-        .mon-tag { position: absolute; top: 0; left: 0; background: rgba(0,0,0,0.8); font-size: 10px; padding: 2px 8px; z-index: 5; font-weight: bold; }
-        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
-
-        .main-screens { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .big-mon { border: 4px solid #333; position: relative; aspect-ratio: 16/9; background: #000; border-radius: 6px; overflow: hidden; }
-        .pvw-active { border-color: var(--pvw); }
-        .pgm-active { border-color: var(--danger); }
-
-        .console { 
-            background: var(--panel); 
-            padding: 15px; 
-            display: grid; 
-            grid-template-columns: 1.5fr 80px 1.2fr; 
-            gap: 20px; 
-            border-top: 2px solid #333;
-            flex-shrink: 0;
         }
 
-        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .mcr-btn { 
-            height: 45px; 
-            background: linear-gradient(#444, #222); 
-            border: 1px solid #666; 
-            color: #fff; 
-            font-size: 10px; 
-            font-weight: bold; 
-            border-radius: 4px; 
-            cursor: pointer;
-        }
-        .mcr-btn:active { background: #111; transform: scale(0.98); }
-
-        .audio-mixer { display: flex; justify-content: space-around; align-items: center; background: #000; border-radius: 5px; padding: 10px; border: 1px solid #333; }
-        .fader-track { width: 12px; height: 50px; background: #222; position: relative; border-radius: 10px; }
-        .fader-knob { width: 22px; height: 10px; background: #888; position: absolute; left: -5px; bottom: 50%; border-radius: 2px; }
-
-        .ticker-patti { position: absolute; bottom: 0; width: 100%; background: #900; height: 35px; border-top: 1px solid #fff; display: flex; align-items: center; overflow: hidden; }
-        .ticker-text { white-space: nowrap; animation: move 12s linear infinite; font-weight: 900; font-size: 18px; color: #fff; padding-left: 100%; }
-        @keyframes move { from { transform: translateX(0); } to { transform: translateX(-200%); } }
-
-        .tbar-track { width: 35px; height: 100px; background: #000; border: 2px solid #444; border-radius: 20px; position: relative; margin: 0 auto; }
-        .tbar-handle { width: 55px; height: 22px; background: #aaa; position: absolute; left: -12px; top: 0; border-radius: 4px; box-shadow: 0 4px 8px #000; }
+        .line { margin: 4px 0; opacity: 0; animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { to { opacity: 1; } }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="app-loader">
-        <div class="spin"></div>
-        <p style="margin-top:20px; font-weight:bold;">LOCKING MCR ENGINE...</p>
+<body>
+
+    <div class="app-container" id="main-app">
+        <h1>C9 UZAIR</h1>
+        <input type="text" id="phoneNum" placeholder="Enter Target Number">
+        
+        <div id="terminal">
+            <div style="color: #555;">> System Ready...</div>
+        </div>
+
+        <div class="status-area" id="statusText"></div>
+
+        <div class="btn-group" id="initial-btns">
+            <button class="btn-main" onclick="startProcess()">Continue</button>
+            <button class="btn-sec" onclick="location.reload()">Close</button>
+        </div>
+
+        <button class="btn-login" id="loginBtn" onclick="openSecondScreen()">Login to Dashboard</button>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <div style="color:var(--danger)">● LIVE MASTER CONTROL</div>
-            <div id="clock" style="color:var(--accent); font-size:18px; font-weight:bold;">00:00:00</div>
-            <div style="color:#666; font-size:10px;">ULTIMATE NO-BAR V4</div>
-        </div>
-
-        <div class="monitor-wall">
-            <div class="side-panel">
-                <div class="mon"><div class="mon-tag">DDR 1 (HOLD)</div><video id="vidDDR" muted playsinline></video></div>
-                <div class="mon"><div class="mon-tag">LIVE FEED 2</div><video id="vidFeed2" muted loop playsinline></video></div>
-                <div class="mon"><div class="mon-tag">SAT 3</div><video id="vidSat" muted loop playsinline src="https://www.w3schools.com/html/mov_bbb.mp4"></video></div>
-                <div class="audio-mixer">
-                    <div class="fader-track"><div class="fader-knob"></div></div>
-                    <div class="fader-track"><div class="fader-knob" style="bottom: 80%;"></div></div>
-                    <div class="fader-track"><div class="fader-knob" style="bottom: 30%;"></div></div>
-                </div>
+    <div id="second-screen">
+        <div class="glass-card">
+            <h2 style="color: var(--accent);">Access Granted</h2>
+            <p style="color: #888;">Target Account:</p>
+            <h3 id="displayNum" style="letter-spacing: 2px;"></h3>
+            
+            <button class="btn-main" style="width: 100%; margin-top: 20px;" id="nextBtn" onclick="showCost()">Next Step</button>
+            
+            <div class="cost-msg" id="costInfo">
+                Server Cost 10$ <br> To Bypass 100k OTP
             </div>
-
-            <div class="main-screens">
-                <div class="big-mon pvw-active"><div class="mon-tag" style="background:var(--pvw); color:#000;">PREVIEW</div><video id="pvwVideo" muted playsinline></video></div>
-                <div class="big-mon pgm-active">
-                    <div class="mon-tag" style="background:var(--danger);">PROGRAM (LIVE)</div>
-                    <video id="pgmVideo" playsinline></video>
-                    <div class="ticker-patti"><div class="ticker-text" id="tickerUI">SYSTEM ONLINE • FULLSCREEN ACTIVE • </div></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="console">
-            <div class="bus-controls">
-                <div class="btn-grid">
-                    <button class="mcr-btn" onclick="document.getElementById('fileIn').click()">SELECT CLIP</button>
-                    <button class="mcr-btn" style="background:var(--danger)" onclick="pushAction()">PUSH TO LIVE</button>
-                    <button class="mcr-btn" onclick="alert('Voice Active')">VOICE</button>
-                    <button class="mcr-btn" onclick="location.reload()">RESET</button>
-                    <button class="mcr-btn">AUTO</button>
-                    <button class="mcr-btn">CUT</button>
-                    <button class="mcr-btn">BLACK</button>
-                    <button class="mcr-btn" style="background:var(--pvw); color:#000;">SET PVW</button>
-                </div>
-            </div>
-
-            <div style="text-align:center;">
-                <div class="tbar-track"><div class="tbar-handle" id="tbar"></div></div>
-            </div>
-
-            <div class="cg-controls">
-                <input type="text" id="cgInput" style="width:100%; padding:10px; background:#000; border:1px solid #444; color:var(--accent); margin-bottom:10px;" placeholder="Breaking News...">
-                <button class="mcr-btn" style="width:100%; background:#0055ff;" onclick="updateCG()">PUSH GRAPHICS</button>
-            </div>
+            <br>
+            <button class="btn-sec" onclick="location.reload()" style="font-size: 0.7rem;">Logout</button>
         </div>
     </div>
-
-    <input type="file" id="fileIn" hidden accept="video/*">
 
     <script>
-        const vDDR = document.getElementById('vidDDR');
-        const vFeed2 = document.getElementById('vidFeed2');
-        const vPGM = document.getElementById('pgmVideo');
-        const vPVW = document.getElementById('pvwVideo');
-        const loader = document.getElementById('app-loader');
-        let clipUrl = null;
+        const terminal = document.getElementById('terminal');
+        const statusArea = document.getElementById('statusText');
+        const initialBtns = document.getElementById('initial-btns');
+        const loginBtn = document.getElementById('loginBtn');
+        const phoneInput = document.getElementById('phoneNum');
 
-        // 1. Initial Load
-        window.onload = () => {
-            setTimeout(() => {
-                vFeed2.src = "video123.mp4"; 
-                vFeed2.play().catch(()=>{});
-                loader.style.display = "none";
-            }, 3000);
-        };
-
-        // 2. Select Clip
-        document.getElementById('fileIn').onchange = (e) => {
-            const file = e.target.files[0];
-            if(file) {
-                clipUrl = URL.createObjectURL(file);
-                vDDR.src = clipUrl;
-                vDDR.play();
-                vPVW.src = clipUrl;
-                vPVW.play();
-            }
-        };
-
-        // 3. PUSH Logic: Replay from 0 + Clear DDR
-        function pushAction() {
-            if(!clipUrl) return;
-            vFeed2.src = clipUrl;
-            vPGM.src = clipUrl;
-            vFeed2.currentTime = 0;
-            vPGM.currentTime = 0;
-            vFeed2.play();
-            vPGM.play();
-            vDDR.src = "";
-            vPVW.src = "";
-            clipUrl = null;
+        function print(text, color = "white") {
+            const div = document.createElement('div');
+            div.className = 'line';
+            div.style.color = color;
+            div.innerHTML = `> ${text}`;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
         }
 
-        // T-Bar Logic
-        const handle = document.getElementById('tbar');
-        handle.addEventListener('touchmove', (e) => {
-            let rect = handle.parentElement.getBoundingClientRect();
-            let y = e.touches[0].clientY - rect.top;
-            if(y >= 0 && y <= 78) {
-                handle.style.top = y + 'px';
-                if(y > 70) pushAction();
-            }
-        }, {passive: true});
+        async function startProcess() {
+            const num = phoneInput.value;
+            if (!num) return alert("Number enter kren!");
 
-        // Clock & CG
-        function updateCG() {
-            const val = document.getElementById('cgInput').value;
-            if(val) document.getElementById('tickerUI').innerText = "BREAKING NEWS: " + val.toUpperCase() + " • ";
+            initialBtns.style.opacity = "0.5";
+            initialBtns.style.pointerEvents = "none";
+            
+            terminal.innerHTML = "";
+            await wait(800); print("Connecting to secure tunnel...", "#0088ff");
+            await wait(1500); print("Removing device links...", "white");
+            await wait(2000); print("Loading bypass modules...", "white");
+            await wait(1200); print("CRITICAL: Failed to bypass!", "#ff3e3e");
+            await wait(1500); print("Retrying with proxy...", "#ffcc00");
+            await wait(2000); print("Account Logged out ☑️", "#00ff41");
+            await wait(1500); print("Bypassing for OTP...", "#00ff41");
+
+            // After Simulation Finishes
+            await wait(1000);
+            statusArea.style.display = "block";
+            statusArea.innerHTML = "100k OTP Need To Bypass This Account";
+            statusArea.style.color = "#ff3e3e";
+            
+            await wait(2000);
+            statusArea.innerHTML = "Success ☑️";
+            statusArea.style.color = "#00ff41";
+            
+            // Swap Buttons
+            initialBtns.style.display = "none";
+            loginBtn.style.display = "block";
         }
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-        // iPad Touch Permission
-        document.body.addEventListener('touchstart', (e) => {
-            [vDDR, vFeed2, vPGM, vPVW].forEach(v => v.play().catch(()=>{}));
-        }, {once: true});
-        
-        // Final Fix: Stop the "Bounce" which triggers the bar
-        document.addEventListener('touchmove', (e) => { if(e.touches.length > 1) e.preventDefault(); }, {passive: false});
+        function openSecondScreen() {
+            document.getElementById('main-app').style.display = "none";
+            document.getElementById('second-screen').style.display = "flex";
+            document.getElementById('displayNum').innerText = phoneInput.value;
+        }
+
+        function showCost() {
+            document.getElementById('nextBtn').style.display = "none";
+            document.getElementById('costInfo').style.display = "block";
+        }
+
+        function wait(ms) { return new Promise(res => setTimeout(res, ms)); }
     </script>
 </body>
 </html>
