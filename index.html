@@ -2,218 +2,215 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C9 UZAIR - System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>C9_OS V100 STABLE</title>
     <style>
-        :root {
-            --primary: #00ff41;
-            --bg: #050505;
-            --card: #111;
-            --danger: #ff3e3e;
-            --accent: #0088ff;
-        }
-
-        body {
-            margin: 0;
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Consolas', monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .app-container {
-            width: 380px;
-            background: var(--card);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            box-shadow: 0 0 25px rgba(0, 255, 65, 0.1);
-            text-align: center;
-        }
-
-        h1 { color: var(--primary); letter-spacing: 4px; margin-bottom: 20px; }
-
-        .input-box {
-            width: 90%;
-            padding: 12px;
-            background: #000;
-            border: 1px solid #444;
-            color: var(--primary);
-            margin-bottom: 15px;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        #terminal {
-            background: #000;
-            height: 150px;
-            text-align: left;
-            padding: 10px;
-            font-size: 0.85rem;
-            overflow-y: auto;
-            border: 1px solid #222;
-            margin-bottom: 15px;
-        }
-
-        .status-area {
-            height: 30px;
-            margin: 10px 0;
-            font-weight: bold;
-            display: none; /* Initially Hidden */
-        }
-
-        .btn-group { display: flex; gap: 10px; }
+        :root { --accent: #00d2ff; --bg: #030305; --panel: #11121a; --text: #8e969f; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
-        button {
-            flex: 1;
-            padding: 12px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.3s;
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: 'SF Pro Display', -apple-system, sans-serif; 
+            height: 100vh; width: 100vw; overflow: hidden;
+            display: flex; flex-direction: column;
         }
 
-        .btn-main { background: var(--primary); color: #000; }
-        .btn-sec { background: #333; color: #fff; }
-        .btn-login { background: var(--accent); color: white; display: none; width: 100%; }
-
-        /* Second Screen Styles */
-        #second-screen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+        /* Top Taskbar */
+        .taskbar { 
+            height: 44px; background: #000; border-bottom: 1px solid #222; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 20px; z-index: 1000;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-            width: 320px;
+        /* Container for all Stages */
+        .viewport { flex: 1; position: relative; width: 100%; height: 100%; }
+
+        /* Unified Stage System */
+        .stage { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: none; flex-direction: column; background: var(--bg);
+        }
+        .active-stage { display: flex !important; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Centered Windows (Login & Config) */
+        .win-center { justify-content: center; align-items: center; }
+        .win-box { 
+            width: 350px; background: var(--panel); border: 1px solid #2a2e38; 
+            padding: 30px; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
-        .cost-msg {
-            color: #ffcc00;
-            margin-top: 20px;
-            display: none;
-            font-size: 1.2rem;
-            border: 1px dashed #ffcc00;
-            padding: 10px;
+        /* Inputs & Buttons */
+        input, select { 
+            width: 100%; background: #08090d; border: 1px solid #333; 
+            color: #fff; padding: 14px; margin: 10px 0; outline: none; border-radius: 5px; font-size: 14px;
+        }
+        .btn { 
+            width: 100%; background: var(--accent); color: #000; border: none; 
+            padding: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; 
+            border-radius: 5px; margin-top: 10px;
         }
 
-        .line { margin: 4px 0; opacity: 0; animation: fadeIn 0.3s forwards; }
-        @keyframes fadeIn { to { opacity: 1; } }
+        /* Forensic Desktop Layout */
+        .desktop { display: flex; width: 100%; height: 100%; overflow: hidden; }
+        
+        /* Left Sidebar */
+        .sidebar { 
+            width: 220px; background: #08090d; border-right: 1px solid #1a1c24; 
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .nav-btn { 
+            padding: 20px 15px; border-bottom: 1px solid #1a1c24; cursor: pointer; 
+            font-size: 12px; font-weight: 500; text-align: left; transition: 0.2s;
+        }
+        .nav-btn:active, .nav-active { background: #14161f; color: var(--accent); border-left: 3px solid var(--accent); }
+
+        /* Right Content Area */
+        .content { flex: 1; display: grid; grid-template-rows: 1fr 120px; overflow: hidden; }
+        .data-list { padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .terminal { 
+            background: #000; border-top: 1px solid #222; padding: 12px; 
+            font-family: 'Courier New', monospace; font-size: 11px; color: #4a4d55; overflow-y: auto;
+        }
+
+        /* Data Styling */
+        .data-item { 
+            border-bottom: 1px solid #1a1c24; padding: 12px 0; font-size: 14px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .data-item b { color: #fff; }
+        .blink { animation: blinker 0.8s infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="main-app">
-        <h1>C9 UZAIR</h1>
-        <input type="text" id="phoneNum" placeholder="Enter Target Number">
+    <div class="taskbar">
+        <div style="color:var(--accent); font-weight:800; font-size:12px;">C9_UZAIR WORKSTATION V100</div>
+        <div style="font-size:10px; color:#444;">SECURITY_LEVEL: OMNI</div>
+    </div>
+
+    <div class="viewport">
         
-        <div id="terminal">
-            <div style="color: #555;">> System Ready...</div>
-        </div>
-
-        <div class="status-area" id="statusText"></div>
-
-        <div class="btn-group" id="initial-btns">
-            <button class="btn-main" onclick="startProcess()">Continue</button>
-            <button class="btn-sec" onclick="location.reload()">Close</button>
-        </div>
-
-        <button class="btn-login" id="loginBtn" onclick="openSecondScreen()">Login to Dashboard</button>
-    </div>
-
-    <div id="second-screen">
-        <div class="glass-card">
-            <h2 style="color: var(--accent);">Access Granted</h2>
-            <p style="color: #888;">Target Account:</p>
-            <h3 id="displayNum" style="letter-spacing: 2px;"></h3>
-            
-            <button class="btn-main" style="width: 100%; margin-top: 20px;" id="nextBtn" onclick="showCost()">Next Step</button>
-            
-            <div class="cost-msg" id="costInfo">
-                Server Cost 10$ <br> To Bypass 100k OTP
+        <div id="st1" class="stage win-center active-stage">
+            <div class="win-box">
+                <h2 style="color:#fff; font-size:16px; margin-bottom:20px; text-align:center;">SYSTEM LOGIN</h2>
+                <input type="text" id="user" placeholder="USERNAME" autocomplete="off">
+                <input type="password" id="pass" placeholder="PASSWORD" autocomplete="off">
+                <button class="btn" onclick="goToConfig()">AUTHENTICATE</button>
             </div>
-            <br>
-            <button class="btn-sec" onclick="location.reload()" style="font-size: 0.7rem;">Logout</button>
         </div>
+
+        <div id="st2" class="stage win-center">
+            <div class="win-box" style="width:420px;">
+                <h2 style="color:#fff; font-size:16px; margin-bottom:20px; text-align:center;">TARGET PARAMETERS</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="text" id="target" value="192.168.10.45">
+                    <input type="text" value="PORT: 4444" readonly>
+                </div>
+                <select id="vector">
+                    <option>Remote Kernel Injection</option>
+                    <option>Bluetooth Stack Overrun</option>
+                    <option>SS7 Intercept Flow</option>
+                </select>
+                <button class="btn" onclick="startHackSequence()">EXECUTE ATTACK</button>
+            </div>
+        </div>
+
+        <div id="st3" class="stage">
+            <div class="desktop">
+                <div class="sidebar">
+                    <div style="padding:15px; font-size:9px; color:#333; letter-spacing:1px;">REMOTE_DUMP_v1</div>
+                    <div class="nav-btn nav-active" onclick="fetchData('con', this)">👤 CONTACTS_LIST</div>
+                    <div class="nav-btn" onclick="fetchData('wa', this)">💬 WHATSAPP_DB</div>
+                    <div class="nav-btn" onclick="fetchData('gps', this)">📍 LIVE_TRACKER</div>
+                    <div class="nav-btn" onclick="fetchData('mic', this)">🎙️ MIC_INTERCEPT</div>
+                    <div class="nav-btn" onclick="fetchData('sms', this)">✉️ SMS_DUMP</div>
+                    <div style="margin-top:auto; padding:15px; font-size:9px; color:#222; text-align:center;">ARCHITECT: C9 UZAIR</div>
+                </div>
+
+                <div class="content">
+                    <div class="data-list" id="display-area">
+                        </div>
+                    <div class="terminal" id="term-logs">
+                        > C9_OS Kernel Active... <br>
+                        > Waiting for remote handshake...
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <script>
-        const terminal = document.getElementById('terminal');
-        const statusArea = document.getElementById('statusText');
-        const initialBtns = document.getElementById('initial-btns');
-        const loginBtn = document.getElementById('loginBtn');
-        const phoneInput = document.getElementById('phoneNum');
+<script>
+    // Utility to switch stages safely
+    function switchStage(toId) {
+        document.querySelectorAll('.stage').forEach(s => s.classList.remove('active-stage'));
+        document.getElementById(toId).classList.add('active-stage');
+    }
 
-        function print(text, color = "white") {
-            const div = document.createElement('div');
-            div.className = 'line';
-            div.style.color = color;
-            div.innerHTML = `> ${text}`;
-            terminal.appendChild(div);
-            terminal.scrollTop = terminal.scrollHeight;
+    function goToConfig() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        if(u === 'admin' && p === 'c9uzair') {
+            switchStage('st2');
+        }
+    }
+
+    async function startHackSequence() {
+        const ip = document.getElementById('target').value;
+        switchStage('st3');
+        
+        const logs = document.getElementById('term-logs');
+        const display = document.getElementById('display-area');
+        
+        display.innerHTML = `<div class="blink" style="color:var(--accent); text-align:center; padding-top:50px;">INITIALIZING EXPLOIT...</div>`;
+
+        const steps = [
+            `Scanning Node: ${ip}... FOUND`,
+            `Injecting Payload via Vector: ${document.getElementById('vector').value}`,
+            `Bypassing Secure Enclave... SUCCESS`,
+            `Escalating Privileges... UID_0 (ROOT) OBTAINED`,
+            `Handshake Stable. Syncing Remote Databases...`
+        ];
+
+        for(let step of steps) {
+            await new Promise(r => setTimeout(r, 1500));
+            logs.innerHTML += `<br>> ${step}`;
+            logs.scrollTop = logs.scrollHeight;
         }
 
-        async function startProcess() {
-            const num = phoneInput.value;
-            if (!num) return alert("Number enter kren!");
+        fetchData('con', document.querySelector('.nav-btn.nav-active'));
+    }
 
-            initialBtns.style.opacity = "0.5";
-            initialBtns.style.pointerEvents = "none";
-            
-            terminal.innerHTML = "";
-            await wait(800); print("Connecting to secure tunnel...", "#0088ff");
-            await wait(1500); print("Removing device links...", "white");
-            await wait(2000); print("Loading bypass modules...", "white");
-            await wait(1200); print("CRITICAL: Failed to bypass!", "#ff3e3e");
-            await wait(1500); print("Retrying with proxy...", "#ffcc00");
-            await wait(2000); print("Account Logged out ☑️", "#00ff41");
-            await wait(1500); print("Bypassing for OTP...", "#00ff41");
+    function fetchData(type, element) {
+        // Handle Active Tabs
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+        element.classList.add('nav-active');
 
-            // After Simulation Finishes
-            await wait(1000);
-            statusArea.style.display = "block";
-            statusArea.innerHTML = "100k OTP Need To Bypass This Account";
-            statusArea.style.color = "#ff3e3e";
-            
-            await wait(2000);
-            statusArea.innerHTML = "Success ☑️";
-            statusArea.style.color = "#00ff41";
-            
-            // Swap Buttons
-            initialBtns.style.display = "none";
-            loginBtn.style.display = "block";
-        }
+        const display = document.getElementById('display-area');
+        display.innerHTML = `<div class="blink" style="font-size:12px;">DECRYPTING BLOB_DATA...</div>`;
 
-        function openSecondScreen() {
-            document.getElementById('main-app').style.display = "none";
-            document.getElementById('second-screen').style.display = "flex";
-            document.getElementById('displayNum').innerText = phoneInput.value;
-        }
+        const names = ["Zeeshan", "Bilal", "Ammi", "Abbu", "Sajid", "Waqas", "Hamza", "Tayyab", "Kamran", "Umer", "Ali", "Hassan", "Kashif"];
 
-        function showCost() {
-            document.getElementById('nextBtn').style.display = "none";
-            document.getElementById('costInfo').style.display = "block";
-        }
-
-        function wait(ms) { return new Promise(res => setTimeout(res, ms)); }
-    </script>
+        setTimeout(() => {
+            display.innerHTML = "";
+            if(type === 'gps') {
+                display.innerHTML = `<div style="height:160px; background:#000; border:1px solid #222; position:relative; border-radius:10px;"><div style="width:12px; height:12px; background:red; border-radius:50%; position:absolute; top:40%; left:50%; box-shadow:0 0 15px red;" class="blink"></div><p style="padding:15px; font-size:11px;">LOC: KARACHI, PK (GULSHAN)</p></div>`;
+            } else if(type === 'mic') {
+                display.innerHTML = `<div style="text-align:center; padding-top:60px;"><h1 style="color:red; font-size:32px;" class="blink">● LIVE</h1><p style="color:#444;">Bitrate: 256kbps | Stream: Encrypted</p></div>`;
+            } else {
+                for(let i=1; i<=30; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'data-item';
+                    if(type === 'con') row.innerHTML = `<span>${names[i%names.length]}</span> <b>+92 3${Math.floor(100000000+Math.random()*900000000)}</b>`;
+                    else if(type === 'wa') row.innerHTML = `<span>${names[Math.floor(Math.random()*names.length)]}</span> <b>"Bhai wo kaam ho gaya."</b>`;
+                    else if(type === 'sms') row.innerHTML = `<span>BANK_AUTH</span> <b>OTP: ${Math.floor(1000+Math.random()*9000)}</b>`;
+                    display.appendChild(row);
+                }
+            }
+        }, 1200);
+    }
+</script>
 </body>
 </html>
