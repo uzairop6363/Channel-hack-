@@ -3,138 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_OS V100 STABLE</title>
+    <title>C9_PEGASUS_X</title>
     <style>
-        :root { --accent: #00d2ff; --bg: #030305; --panel: #11121a; --text: #8e969f; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        :root { --main: #00ffcc; --bg: #0d0e12; --panel: #1a1c23; --text: #d1d5db; --dim: #4b5563; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* OS Interface */
+        .top-bar { height: 35px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; font-size: 11px; font-weight: 600; color: var(--main); }
+        .viewport { flex: 1; position: relative; }
+
+        /* Window System */
+        .win { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--bg); }
+        .active-win { display: flex !important; }
         
-        body { 
-            background: var(--bg); color: var(--text); 
-            font-family: 'SF Pro Display', -apple-system, sans-serif; 
-            height: 100vh; width: 100vw; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-
-        /* Top Taskbar */
-        .taskbar { 
-            height: 44px; background: #000; border-bottom: 1px solid #222; 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 20px; z-index: 1000;
-        }
-
-        /* Container for all Stages */
-        .viewport { flex: 1; position: relative; width: 100%; height: 100%; }
-
-        /* Unified Stage System */
-        .stage { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            display: none; flex-direction: column; background: var(--bg);
-        }
-        .active-stage { display: flex !important; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Centered Windows (Login & Config) */
-        .win-center { justify-content: center; align-items: center; }
-        .win-box { 
-            width: 350px; background: var(--panel); border: 1px solid #2a2e38; 
-            padding: 30px; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-        }
-
+        /* Central UI */
+        .center-flex { justify-content: center; align-items: center; }
+        .card { width: 380px; background: var(--panel); border: 1px solid #2d313d; padding: 30px; border-radius: 4px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
+        
         /* Inputs & Buttons */
-        input, select { 
-            width: 100%; background: #08090d; border: 1px solid #333; 
-            color: #fff; padding: 14px; margin: 10px 0; outline: none; border-radius: 5px; font-size: 14px;
-        }
-        .btn { 
-            width: 100%; background: var(--accent); color: #000; border: none; 
-            padding: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; 
-            border-radius: 5px; margin-top: 10px;
-        }
+        input, select { width: 100%; background: #0a0b0e; border: 1px solid #333; color: #fff; padding: 12px; margin: 8px 0; outline: none; border-radius: 4px; font-size: 13px; }
+        .action-btn { width: 100%; background: var(--main); color: #000; border: none; padding: 15px; font-weight: 800; cursor: pointer; text-transform: uppercase; border-radius: 4px; margin-top: 15px; letter-spacing: 1px; }
 
-        /* Forensic Desktop Layout */
-        .desktop { display: flex; width: 100%; height: 100%; overflow: hidden; }
+        /* Forensic Desktop */
+        .desktop { display: grid; grid-template-columns: 200px 1fr; height: 100%; width: 100%; }
+        .side { background: #0a0b0e; border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .nav-link { padding: 15px; border-bottom: 1px solid #1a1c23; cursor: pointer; font-size: 11px; color: var(--dim); transition: 0.2s; }
+        .nav-link:hover, .active-nav { background: var(--panel); color: var(--main); border-left: 3px solid var(--main); }
+
+        /* Data & Terminal */
+        .main-stage { display: grid; grid-template-rows: 1fr 140px; overflow: hidden; }
+        .data-box { padding: 20px; overflow-y: auto; background: #0d0e12; }
+        .term { background: #000; border-top: 1px solid #222; padding: 12px; font-family: 'Consolas', monospace; font-size: 11px; color: #555; overflow-y: auto; }
         
-        /* Left Sidebar */
-        .sidebar { 
-            width: 220px; background: #08090d; border-right: 1px solid #1a1c24; 
-            display: flex; flex-direction: column; overflow-y: auto;
-        }
-        .nav-btn { 
-            padding: 20px 15px; border-bottom: 1px solid #1a1c24; cursor: pointer; 
-            font-size: 12px; font-weight: 500; text-align: left; transition: 0.2s;
-        }
-        .nav-btn:active, .nav-active { background: #14161f; color: var(--accent); border-left: 3px solid var(--accent); }
+        /* Data Rows */
+        .row { border-bottom: 1px solid #1a1c23; padding: 12px 0; font-size: 13px; display: flex; justify-content: space-between; }
+        .row b { color: #fff; }
+        .chat-bubble { font-size: 11px; color: #888; margin-top: 4px; font-style: italic; }
 
-        /* Right Content Area */
-        .content { flex: 1; display: grid; grid-template-rows: 1fr 120px; overflow: hidden; }
-        .data-list { padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .terminal { 
-            background: #000; border-top: 1px solid #222; padding: 12px; 
-            font-family: 'Courier New', monospace; font-size: 11px; color: #4a4d55; overflow-y: auto;
-        }
-
-        /* Data Styling */
-        .data-item { 
-            border-bottom: 1px solid #1a1c24; padding: 12px 0; font-size: 14px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .data-item b { color: #fff; }
-        .blink { animation: blinker 0.8s infinite; }
+        /* Animations */
+        .blink { animation: blinker 1s infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
+        .loader-bar { height: 2px; width: 0%; background: var(--main); transition: 0.4s; box-shadow: 0 0 10px var(--main); }
     </style>
 </head>
 <body>
 
-    <div class="taskbar">
-        <div style="color:var(--accent); font-weight:800; font-size:12px;">C9_UZAIR WORKSTATION V100</div>
-        <div style="font-size:10px; color:#444;">SECURITY_LEVEL: OMNI</div>
+    <div class="top-bar">
+        <div>C9_UZAIR // PEGASUS_X_KERNEL</div>
+        <div id="clock">12:23:40 PM</div>
     </div>
 
     <div class="viewport">
         
-        <div id="st1" class="stage win-center active-stage">
-            <div class="win-box">
-                <h2 style="color:#fff; font-size:16px; margin-bottom:20px; text-align:center;">SYSTEM LOGIN</h2>
-                <input type="text" id="user" placeholder="USERNAME" autocomplete="off">
-                <input type="password" id="pass" placeholder="PASSWORD" autocomplete="off">
-                <button class="btn" onclick="goToConfig()">AUTHENTICATE</button>
+        <div id="win1" class="win center-flex active-win">
+            <div class="card">
+                <div style="text-align:center; margin-bottom:20px;">
+                    <h3 style="color:#fff;">SYSTEM AUTH</h3>
+                    <p style="font-size:9px; color:var(--dim);">ENCRYPTED BY RSA-4096</p>
+                </div>
+                <input type="text" id="u" placeholder="AUTH_ID" autocomplete="off">
+                <input type="password" id="p" placeholder="SECRET_KEY" autocomplete="off">
+                <button class="action-btn" onclick="auth()">DECRYPT ACCESS</button>
             </div>
         </div>
 
-        <div id="st2" class="stage win-center">
-            <div class="win-box" style="width:420px;">
-                <h2 style="color:#fff; font-size:16px; margin-bottom:20px; text-align:center;">TARGET PARAMETERS</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input type="text" id="target" value="192.168.10.45">
-                    <input type="text" value="PORT: 4444" readonly>
+        <div id="win2" class="win center-flex">
+            <div class="card" style="width:450px;">
+                <h4 style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:5px;">VECTOR_CONFIGURATION</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <input type="text" id="target_ip" value="192.168.10.114">
+                    <input type="text" value="SSL_PORT: 443" readonly>
                 </div>
-                <select id="vector">
-                    <option>Remote Kernel Injection</option>
-                    <option>Bluetooth Stack Overrun</option>
-                    <option>SS7 Intercept Flow</option>
+                <select id="payload_type">
+                    <option>PEGASUS_V3: WhatsApp Buffer Overrun</option>
+                    <option>ZERO_CLICK: Image-Blob RCE</option>
+                    <option>SS7: Cellular Intercept Protocol</option>
                 </select>
-                <button class="btn" onclick="startHackSequence()">EXECUTE ATTACK</button>
+                <div style="font-size:10px; color:var(--dim); margin:10px 0;">Establishing encrypted tunnel through 3 proxy nodes...</div>
+                <div class="loader-bar" id="load1"></div>
+                <button class="action-btn" id="run_btn" onclick="startExecution()">INITIALIZE EXPLOIT</button>
             </div>
         </div>
 
-        <div id="st3" class="stage">
+        <div id="win3" class="win">
             <div class="desktop">
-                <div class="sidebar">
-                    <div style="padding:15px; font-size:9px; color:#333; letter-spacing:1px;">REMOTE_DUMP_v1</div>
-                    <div class="nav-btn nav-active" onclick="fetchData('con', this)">👤 CONTACTS_LIST</div>
-                    <div class="nav-btn" onclick="fetchData('wa', this)">💬 WHATSAPP_DB</div>
-                    <div class="nav-btn" onclick="fetchData('gps', this)">📍 LIVE_TRACKER</div>
-                    <div class="nav-btn" onclick="fetchData('mic', this)">🎙️ MIC_INTERCEPT</div>
-                    <div class="nav-btn" onclick="fetchData('sms', this)">✉️ SMS_DUMP</div>
-                    <div style="margin-top:auto; padding:15px; font-size:9px; color:#222; text-align:center;">ARCHITECT: C9 UZAIR</div>
+                <div class="side">
+                    <div style="padding:15px; font-size:10px; color:#333;">REMOTE_FS_MOUNTED</div>
+                    <div class="nav-link active-nav" onclick="loadData('con', this)">👤 CONTACTS</div>
+                    <div class="nav-link" onclick="loadData('wa', this)">💬 WHATSAPP_DB</div>
+                    <div class="nav-link" onclick="loadData('gps', this)">📍 LIVE_GPS</div>
+                    <div class="nav-link" onclick="loadData('sms', this)">✉️ SMS_INBOX</div>
+                    <div class="nav-link" onclick="loadData('mic', this)">🎙️ MIC_CONTROL</div>
+                    <div style="margin-top:auto; padding:15px; font-size:9px; color:#222; text-align:center;">C9 UZAIR FORENSICS</div>
                 </div>
-
-                <div class="content">
-                    <div class="data-list" id="display-area">
+                <div class="main-stage">
+                    <div class="data-box" id="output">
                         </div>
-                    <div class="terminal" id="term-logs">
-                        > C9_OS Kernel Active... <br>
-                        > Waiting for remote handshake...
+                    <div class="term" id="console_logs">
+                        > Starting kernel injection... <br>
+                        > Payload delivered via Webkit...
                     </div>
                 </div>
             </div>
@@ -143,73 +111,87 @@
     </div>
 
 <script>
-    // Utility to switch stages safely
-    function switchStage(toId) {
-        document.querySelectorAll('.stage').forEach(s => s.classList.remove('active-stage'));
-        document.getElementById(toId).classList.add('active-stage');
-    }
+    const wait = ms => new Promise(res => setTimeout(res, ms));
 
-    function goToConfig() {
-        const u = document.getElementById('user').value;
-        const p = document.getElementById('pass').value;
-        if(u === 'admin' && p === 'c9uzair') {
-            switchStage('st2');
+    function auth() {
+        if(document.getElementById('u').value === 'admin' && document.getElementById('p').value === 'c9uzair') {
+            document.getElementById('win1').classList.remove('active-win');
+            document.getElementById('win2').classList.add('active-win');
         }
     }
 
-    async function startHackSequence() {
-        const ip = document.getElementById('target').value;
-        switchStage('st3');
-        
-        const logs = document.getElementById('term-logs');
-        const display = document.getElementById('display-area');
-        
-        display.innerHTML = `<div class="blink" style="color:var(--accent); text-align:center; padding-top:50px;">INITIALIZING EXPLOIT...</div>`;
+    async function startExecution() {
+        const btn = document.getElementById('run_btn');
+        const bar = document.getElementById('load1');
+        btn.disabled = true;
+        btn.innerText = "EXECUTING...";
 
-        const steps = [
-            `Scanning Node: ${ip}... FOUND`,
-            `Injecting Payload via Vector: ${document.getElementById('vector').value}`,
-            `Bypassing Secure Enclave... SUCCESS`,
-            `Escalating Privileges... UID_0 (ROOT) OBTAINED`,
-            `Handshake Stable. Syncing Remote Databases...`
+        // Real Long Process (30-40 Seconds Flow)
+        const logPoints = [
+            "Handshaking with Proxy Node 1 (Switzerland)... SUCCESS",
+            "Handshaking with Proxy Node 2 (Russia)... SUCCESS",
+            "Targeting Port 443 via SSL Bypass...",
+            "Injecting Pegasus_v3.bin into WhatsApp Cache...",
+            "WARNING: Sandbox Integrity Check... BYPASSING",
+            "Escalating Privileges to UID_0... OK",
+            "Gaining Root access to MediaStore...",
+            "Synchronizing SQLite Databases... 100%"
         ];
 
-        for(let step of steps) {
-            await new Promise(r => setTimeout(r, 1500));
-            logs.innerHTML += `<br>> ${step}`;
-            logs.scrollTop = logs.scrollHeight;
+        for(let i=0; i<logPoints.length; i++) {
+            bar.style.width = ((i+1) * 12.5) + "%";
+            await wait(3500); // 3.5 seconds per step = ~28 seconds total
+            console.log(logPoints[i]); // Background tracking
         }
 
-        fetchData('con', document.querySelector('.nav-btn.nav-active'));
+        document.getElementById('win2').classList.remove('active-win');
+        document.getElementById('win3').classList.add('active-win');
+        
+        // Populate initial data
+        loadData('con', document.querySelector('.nav-link.active-nav'));
     }
 
-    function fetchData(type, element) {
-        // Handle Active Tabs
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-        element.classList.add('nav-active');
-
-        const display = document.getElementById('display-area');
-        display.innerHTML = `<div class="blink" style="font-size:12px;">DECRYPTING BLOB_DATA...</div>`;
-
-        const names = ["Zeeshan", "Bilal", "Ammi", "Abbu", "Sajid", "Waqas", "Hamza", "Tayyab", "Kamran", "Umer", "Ali", "Hassan", "Kashif"];
+    function loadData(type, el) {
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active-nav'));
+        el.classList.add('active-nav');
+        
+        const output = document.getElementById('output');
+        const logs = document.getElementById('console_logs');
+        output.innerHTML = `<div class="blink" style="color:var(--main); font-size:12px;">DECRYPTING DATABASE_STREAM...</div>`;
+        
+        const users = ["Zeeshan", "Bilal", "Sajid", "Ammi Jaan", "Abbu", "Hamza", "Tayyab", "Kamran", "Farhan", "Umer", "Ali", "Hassan"];
+        const msgs = [
+            "Bhai wo kaam ho gaya hai.",
+            "Kal milte hain market me.",
+            "File send kardi hai check kar lo.",
+            "OTP aya hai screen par?",
+            "Ghar pohnch kar call karna.",
+            "Theek hai, main dekh leta hoon."
+        ];
 
         setTimeout(() => {
-            display.innerHTML = "";
+            output.innerHTML = "";
+            logs.innerHTML += `<br>> Fetching ${type} logs... SUCCESS`;
+            logs.scrollTop = logs.scrollHeight;
+
             if(type === 'gps') {
-                display.innerHTML = `<div style="height:160px; background:#000; border:1px solid #222; position:relative; border-radius:10px;"><div style="width:12px; height:12px; background:red; border-radius:50%; position:absolute; top:40%; left:50%; box-shadow:0 0 15px red;" class="blink"></div><p style="padding:15px; font-size:11px;">LOC: KARACHI, PK (GULSHAN)</p></div>`;
+                output.innerHTML = `<div style="height:180px; background:#000; border:1px solid #222; position:relative;"><div style="width:12px; height:12px; background:red; border-radius:50%; position:absolute; top:45%; left:55%; box-shadow:0 0 15px red;" class="blink"></div><p style="padding:15px; font-size:10px;">LOC: KARACHI, PK (GULSHAN)</p></div>`;
             } else if(type === 'mic') {
-                display.innerHTML = `<div style="text-align:center; padding-top:60px;"><h1 style="color:red; font-size:32px;" class="blink">● LIVE</h1><p style="color:#444;">Bitrate: 256kbps | Stream: Encrypted</p></div>`;
+                output.innerHTML = `<div style="text-align:center; padding-top:60px;"><h1 style="color:red; font-size:32px;" class="blink">● LIVE</h1><p style="color:#444;">Encrypted VoIP Stream Intercepted</p></div>`;
             } else {
-                for(let i=1; i<=30; i++) {
-                    const row = document.createElement('div');
-                    row.className = 'data-item';
-                    if(type === 'con') row.innerHTML = `<span>${names[i%names.length]}</span> <b>+92 3${Math.floor(100000000+Math.random()*900000000)}</b>`;
-                    else if(type === 'wa') row.innerHTML = `<span>${names[Math.floor(Math.random()*names.length)]}</span> <b>"Bhai wo kaam ho gaya."</b>`;
-                    else if(type === 'sms') row.innerHTML = `<span>BANK_AUTH</span> <b>OTP: ${Math.floor(1000+Math.random()*9000)}</b>`;
-                    display.appendChild(row);
+                for(let i=0; i<30; i++) {
+                    const r = document.createElement('div');
+                    r.className = 'row';
+                    const name = users[i % users.length];
+                    const msg = msgs[i % msgs.length];
+                    
+                    if(type === 'con') r.innerHTML = `<span>${name}</span> <b>+92 3${Math.floor(100000000+Math.random()*900000000)}</b>`;
+                    else if(type === 'wa') r.innerHTML = `<div><span>${name}</span><div class="chat-bubble">"${msg}"</div></div> <b>Online</b>`;
+                    else if(type === 'sms') r.innerHTML = `<span>${name}</span> <b>Received</b>`;
+                    output.appendChild(r);
                 }
             }
-        }, 1200);
+        }, 1500);
     }
 </script>
 </body>
