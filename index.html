@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_UZAIR_EVIL_TWIN</title>
+    <title>C9_UZAIR_MASTER_V3</title>
     <style>
         :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --success: #00ff88; --warn: #ffcc00; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
@@ -15,34 +15,37 @@
             transform: translate(-50%, -50%) rotate(90deg); transform-origin: center;
         }
 
-        /* --- LOGIN & SPLASH --- */
-        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; justify-content: center; align-items: center; }
-        .login-box { width: 380px; padding: 25px; border: 1.5px solid var(--accent); background: var(--panel); text-align: center; box-shadow: 0 0 30px rgba(0,212,255,0.2); }
+        /* --- STAGE 0: LOGIN --- */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; justify-content: center; align-items: center; }
+        .login-box { width: 400px; padding: 30px; border: 2px solid var(--accent); background: var(--panel); text-align: center; box-shadow: 0 0 40px rgba(0,212,255,0.2); }
+        .login-box input { width: 100%; background: #000; border: 1px solid #333; color: var(--success); padding: 15px; text-align: center; font-size: 18px; margin: 20px 0; outline: none; }
 
-        /* --- MAIN LAYOUT --- */
-        .app-container { display: none; flex-direction: column; height: 100%; width: 100%; padding: 8px; overflow: hidden; }
+        /* --- MAIN APP CONTAINER --- */
+        .app-container { display: none; flex-direction: column; height: 100%; width: 100%; padding: 10px; overflow: hidden; }
         .active-app { display: flex !important; }
 
-        .header { font-size: 14px; font-weight: 900; color: #fff; padding: 8px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .header-bar { font-size: 14px; font-weight: 900; color: #fff; padding: 10px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
 
-        .main-frame { display: flex; height: 100%; width: 100%; gap: 10px; padding-top: 10px; overflow: hidden; }
-        
-        /* --- TERMINAL (LEFT) --- */
-        .terminal { flex: 1.3; background: #000; border: 1px solid var(--border); padding: 20px 30px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.6; display: flex; flex-direction: column; }
-        #terminal-output { flex: 1; }
-        .command-line { display: flex; gap: 10px; color: var(--success); font-weight: bold; margin-top: 10px; }
-        .command-line input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 15px; }
+        .screen { display: none; height: 100%; width: 100%; gap: 10px; padding-top: 10px; overflow: hidden; }
+        .active-screen { display: flex !important; }
 
-        /* --- CONTROLS (RIGHT) --- */
-        .controls { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .module-box { background: var(--panel); border: 1px solid var(--border); padding: 12px; }
-        
+        /* --- SHARED UI --- */
+        .log-section { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px 30px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.5; }
+        .ctrl-section { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .input-box { background: var(--panel); border: 1px solid var(--border); padding: 10px; margin-bottom: 5px; }
+        label { font-size: 10px; color: var(--accent); display: block; margin-bottom: 4px; font-weight: bold; }
+        input[type="text"] { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; font-size: 15px; outline: none; }
+
         /* --- BUTTONS --- */
-        .btn { background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); padding: 16px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; letter-spacing: 1px; transition: 0.1s; width: 100%; margin-bottom: 5px; }
-        .btn:active { transform: scale(0.95); background: var(--accent); color: #000; }
-        .btn-green { border-color: var(--success); color: var(--success); }
+        .btn { background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); padding: 15px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; transition: 0.1s; letter-spacing: 1px; }
+        .btn:active { transform: scale(0.95); background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
+        .btn-active { background: var(--accent); color: #000; border: none; margin-top: auto; }
 
-        .branding { font-size: 11px; text-align: center; padding: 5px; color: #333; letter-spacing: 5px; font-weight: bold; }
+        /* --- TERMINAL COMMAND LINE --- */
+        .cmd-line { display: flex; gap: 10px; color: var(--success); margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
+        .cmd-line input { background: transparent; border: none; color: #fff; outline: none; flex: 1; font-size: 15px; }
+
+        .footer { font-size: 11px; padding: 8px 30px; color: #444; border-top: 1px solid #111; display: flex; justify-content: space-between; }
 
         @media screen and (orientation: landscape) { body { height: 100vh; width: 100vw; transform: none; top: 0; left: 0; } }
     </style>
@@ -51,116 +54,124 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h1 style="color:#fff; font-size:22px; margin-bottom:5px;">C9_UZAIR_STRIKE</h1>
-            <p style="font-size:10px; color:var(--accent); margin-bottom:20px; letter-spacing:2px;">ENCRYPTED ACCESS POINT</p>
-            <input type="password" id="key" placeholder="ENTER ACCESS KEY" style="width:100%; background:#000; border:1px solid #333; color:var(--success); padding:12px; text-align:center; font-size:16px; margin-bottom:15px; outline:none;">
-            <button class="btn" onclick="initSystem()">INITIALIZE BOOT</button>
-            <p style="margin-top:10px; font-size:9px; color:#444;">&copy; MADE BY C9 UZAIR</p>
+            <h1 style="color:#fff; font-size:24px;">C9_UZAIR_STRIKE</h1>
+            <p style="color:var(--accent); font-size:10px; letter-spacing:3px;">SYSTEM ACCESS CONTROL</p>
+            <input type="password" id="passkey" placeholder="ACCESS KEY">
+            <button class="btn" style="width:100%" onclick="login()">INITIALIZE SYSTEM</button>
+            <p style="margin-top:15px; font-size:10px; opacity:0.5;">MADE BY C9 UZAIR</p>
         </div>
     </div>
 
     <div class="app-container" id="app">
-        <div class="header">
-            <span>NETWORK_STRIKE_V2.0 // <span style="color:var(--accent)">EVIL_TWIN_MODE</span></span>
-            <span style="color:var(--warn)">BY: C9 UZAIR</span>
+        <div class="header-bar">
+            <span>C9_STRIKE_V3.0 // <span id="mode-text">INFRA_SETUP</span></span>
+            <span style="color:var(--accent)">DESIGNED BY C9 UZAIR</span>
         </div>
 
-        <div class="main-frame">
-            <div class="terminal">
-                <div id="terminal-output">
-                    <span style="color:var(--success)">[+] C9_UZAIR Kernel Loaded...</span><br>
-                    [+] Wireless Interfaces Initialized.<br>
-                    [!] Type 'help' to see manual commands.
+        <div id="scr-1" class="screen active-screen">
+            <div class="log-section" id="log-1">
+                <span style="color:var(--success)">[+] KERNEL_LOADED</span><br>
+                > Awaiting RDP Infrastructure Configuration...<br>
+                > Manual setup required.
+            </div>
+            <div class="ctrl-section">
+                <div class="input-box">
+                    <label>SERVER_IP</label><input type="text" id="ip" value="162.251.10.92">
                 </div>
-                <div class="command-line">
+                <div class="input-box">
+                    <label>SSH_PORT</label><input type="text" value="22">
+                </div>
+                <button class="btn" onclick="rdpStep(1)">PING SERVER</button>
+                <button class="btn" onclick="rdpStep(2)">ESTABLISH RSA LINK</button>
+                <button class="btn btn-active" id="next-btn" style="display:none;" onclick="goTo(2)">ACCESS TERMINAL</button>
+            </div>
+        </div>
+
+        <div id="scr-2" class="screen">
+            <div class="log-section">
+                <div id="term-out">
+                    <span style="color:var(--accent)">[ UPLINK_STABLE ]</span><br>
+                    > Terminal ready for manual commands.<br>
+                    > Type 'scan' to begin Evil Twin reconnaissance.
+                </div>
+                <div class="cmd-line">
                     <span>uzair@c9:~$</span>
-                    <input type="text" id="cmd-input" autofocus onkeydown="handleCommand(event)">
+                    <input type="text" id="cmd-in" onkeydown="handleCmd(event)">
                 </div>
             </div>
-
-            <div class="controls">
-                <div class="module-box">
-                    <p style="font-size:10px; color:var(--accent); margin-bottom:8px;">MANUAL OVERRIDE</p>
-                    <button class="btn" onclick="manualAction('airmon-ng start wlan0')">START MONITOR</button>
-                    <button class="btn" onclick="manualAction('airodump-ng wlan0mon')">SCAN SIGNALS</button>
-                    <button class="btn" onclick="manualAction('fluxion-start')">LAUNCH EVIL TWIN</button>
+            <div class="ctrl-section">
+                <div class="input-box" style="flex:1;">
+                    <label>QUICK_ACTIONS</label>
+                    <button class="btn" style="width:100%; margin-bottom:10px;" onclick="quickCmd('airmon-ng start')">MONITOR_MODE</button>
+                    <button class="btn" style="width:100%; margin-bottom:10px;" onclick="quickCmd('airodump-ng scan')">SCAN_WIFI</button>
+                    <button class="btn" style="width:100%; border-color:var(--warn); color:var(--warn);" onclick="quickCmd('fluxion-run')">LAUNCH_EVIL_TWIN</button>
                 </div>
-                
-                <div class="module-box" style="flex:1;">
-                    <p style="font-size:10px; color:var(--accent); margin-bottom:8px;">STRIKE LOGS</p>
-                    <div id="mini-log" style="font-size:10px; color:#555; overflow:hidden;">
-                        - Waiting for user input...
-                    </div>
+                <div style="background:#000; border:1px solid var(--border); padding:10px; font-size:10px; color:#555;">
+                    CREDIT: <span style="color:var(--accent)">C9 UZAIR</span>
                 </div>
-
-                <div class="branding">MADE BY C9 UZAIR</div>
             </div>
+        </div>
+
+        <div class="footer">
+            <span>MODE: RDP_ENCRYPTED</span>
+            <span style="font-weight:bold; letter-spacing:2px;">POWERED BY C9 UZAIR</span>
         </div>
     </div>
 
 <script>
-    const output = document.getElementById('terminal-output');
-    const cmdInput = document.getElementById('cmd-input');
+    const wait = ms => new Promise(res => setTimeout(res, ms));
 
-    function initSystem() {
-        const k = document.getElementById('key').value;
-        if(k === "C9") {
+    function login() {
+        if(document.getElementById('passkey').value === "C9") {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').classList.add('active-app');
-            logToTerminal("System Boot Sequence Complete. Welcome, Uzair.", "#00ff88");
-        } else {
-            alert("WRONG KEY! ACCESS DENIED.");
+        } else { alert("WRONG KEY!"); }
+    }
+
+    async function rdpStep(s) {
+        const log = document.getElementById('log-1');
+        if(s===1) {
+            log.innerHTML += `<br><span style="color:var(--warn)">> Pinging ${document.getElementById('ip').value}...</span>`;
+            await wait(1000);
+            log.innerHTML += `<br><span style="color:var(--success)">> Reply: 32 bytes time=12ms TTL=54</span>`;
+        } else if(s===2) {
+            log.innerHTML += `<br>> Negotiating RSA-4096 / AES-GCM...`;
+            await wait(1500);
+            log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] Secure Link Established.</span>`;
+            document.getElementById('next-btn').style.display = 'block';
         }
     }
 
-    function logToTerminal(text, color="#fff") {
-        output.innerHTML += `<br><span style="color:${color}">> ${text}</span>`;
-        output.scrollTop = output.scrollHeight;
-        document.getElementById('mini-log').innerHTML = text;
+    function goTo(n) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(`scr-${n}`).classList.add('active-screen');
+        document.getElementById('mode-text').innerText = "EVIL_TWIN_STRIKE";
     }
 
-    function manualAction(cmd) {
-        cmdInput.value = cmd;
-        handleCommand({key: 'Enter'});
+    function quickCmd(c) {
+        document.getElementById('cmd-in').value = c;
+        handleCmd({key: 'Enter'});
     }
 
-    async function handleCommand(e) {
+    async function handleCmd(e) {
         if(e.key === 'Enter') {
-            const cmd = cmdInput.value.toLowerCase();
-            logToTerminal(`uzair@c9:~$ ${cmd}`, "#00d4ff");
-            cmdInput.value = '';
+            const val = document.getElementById('cmd-in').value.toLowerCase();
+            const out = document.getElementById('term-out');
+            out.innerHTML += `<br><span style="color:var(--success)">uzair@c9:~$ ${val}</span>`;
+            document.getElementById('cmd-in').value = '';
 
-            if(cmd.includes('airmon')) {
-                logToTerminal("Enabling Monitor Mode on wlan0...", "#warn");
-                await new Promise(r => setTimeout(r, 1500));
-                logToTerminal("Monitor Mode Enabled: wlan0mon active.", "#00ff88");
-            } 
-            else if(cmd.includes('airodump')) {
-                logToTerminal("Scanning for real nearby signals...", "#warn");
-                await new Promise(r => setTimeout(r, 2000));
-                // Real Simulation of WiFi Lists
-                const wifis = ["PTCL-BB-92", "C9_SECURE_EXT", "TP-LINK_5G", "Mobile_Hotspot"];
-                wifis.forEach(w => logToTerminal(`FOUND: [${w}] - PWR: -${Math.floor(Math.random()*60+20)}dBm`, "#fff"));
+            if(val.includes('scan')) {
+                out.innerHTML += `<br><span style="color:var(--warn)">> Scanning nearby airwaves (Real-Time)...</span>`;
+                await wait(2000);
+                const nets = ["PTCL-92", "C9_GUEST_WIFI", "TP-LINK_EXT", "Mobile_Hotspot"];
+                nets.forEach(n => out.innerHTML += `<br>FOUND: [${n}] -- PWR: -${Math.floor(Math.random()*50+20)}dBm`);
+            } else if(val.includes('fluxion')) {
+                out.innerHTML += `<br><span style="color:var(--warn)">> Initializing Evil Twin Attack...</span>`;
+                await wait(1500);
+                out.innerHTML += `<br><span style="color:#ff4757;">> Deauthenticating target... [SUCCESS]</span>`;
+                out.innerHTML += `<br><span style="color:var(--accent);">> Starting Captive Portal for C9 UZAIR...</span>`;
             }
-            else if(cmd.includes('fluxion')) {
-                logToTerminal("Starting Evil Twin Framework...", "#00ff88");
-                await new Promise(r => setTimeout(r, 1500));
-                logToTerminal("CREATING FAKE AP: [C9_UZAIR_FREE_WIFI]", "#ff4757");
-                logToTerminal("Captive Portal: Online at 192.168.1.1", "#ff4757");
-                logToTerminal("Waiting for victim connection...", "#warn");
-                await new Promise(r => setTimeout(r, 3000));
-                logToTerminal("VICTIM CONNECTED! MAC: 00:AF:E2:91", "#00ff88");
-                logToTerminal("Sniffing Handshake... SUCCESS.", "#00ff88");
-            }
-            else if(cmd === 'help') {
-                logToTerminal("Commands: help, airmon-ng, airodump-ng, fluxion-start, clear", "#accent");
-            }
-            else if(cmd === 'clear') {
-                output.innerHTML = '';
-            }
-            else {
-                logToTerminal("Unknown Command: Type 'help' for options.", "#ff4757");
-            }
+            out.scrollTop = out.scrollHeight;
         }
     }
 </script>
