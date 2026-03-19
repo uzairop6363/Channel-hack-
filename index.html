@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_UZAIR_MASTER_V4</title>
+    <title>C9_UZAIR_STRIKE_V5</title>
     <style>
         :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --success: #00ff88; --warn: #ffcc00; --err: #ff4757; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
@@ -15,180 +15,167 @@
             transform: translate(-50%, -50%) rotate(90deg); transform-origin: center;
         }
 
-        /* --- LOGIN --- */
-        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; justify-content: center; align-items: center; }
-        .login-box { width: 400px; padding: 30px; border: 2px solid var(--accent); background: var(--panel); text-align: center; }
-        .login-box input { width: 100%; background: #000; border: 1px solid #333; color: var(--success); padding: 15px; text-align: center; font-size: 18px; margin: 20px 0; outline: none; }
+        /* --- SCREENS --- */
+        #login-screen, #infra-screen, #evil-twin-screen { position: fixed; inset: 0; display: none; flex-direction: column; padding: 10px; }
+        .active { display: flex !important; }
 
-        /* --- MAIN APP --- */
-        .app-container { display: none; flex-direction: column; height: 100%; width: 100%; padding: 10px; overflow: hidden; }
-        .active-app { display: flex !important; }
-
-        .header-bar { font-size: 14px; font-weight: 900; color: #fff; padding: 10px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-
-        .screen { display: none; height: 100%; width: 100%; gap: 10px; padding-top: 10px; overflow: hidden; }
-        .active-screen { display: flex !important; }
-
-        /* --- LEFT SIDE: LOGS (Scrollable) --- */
-        .log-section { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px 30px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.5; position: relative; }
-        
-        /* --- RIGHT SIDE: CONTROLS (Scrollable Box) --- */
-        .ctrl-section { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 5px; }
+        /* --- UI BOXES --- */
+        .terminal-box { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px 30px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.6; }
+        .side-ctrl { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
         .input-box { background: var(--panel); border: 1px solid var(--border); padding: 10px; margin-bottom: 5px; }
-        label { font-size: 10px; color: var(--accent); display: block; margin-bottom: 4px; font-weight: bold; }
-        input[type="text"] { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; font-size: 15px; outline: none; }
+        input { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; font-size: 15px; outline: none; }
 
-        /* --- BUTTONS WITH LOADING ANIMATION --- */
+        /* --- BUTTONS --- */
         .btn { 
             background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); 
-            padding: 15px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; 
-            transition: 0.2s; letter-spacing: 1px; position: relative; overflow: hidden;
+            padding: 18px 5px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; 
+            transition: 0.2s; letter-spacing: 1px;
         }
         .btn:active { transform: scale(0.95); background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
-        .btn.loading { opacity: 0.6; pointer-events: none; border-style: dashed; }
-        .btn-active { background: var(--accent); color: #000; border: none; margin-top: auto; }
+        .btn-green { border-color: var(--success); color: var(--success); }
+        .btn-red { border-color: var(--err); color: var(--err); }
+        .loading { opacity: 0.5; pointer-events: none; border-style: dotted; }
 
-        /* --- TERMINAL INPUT --- */
-        .cmd-line { display: flex; gap: 10px; color: var(--success); margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
-        .cmd-line input { background: transparent; border: none; color: #fff; outline: none; flex: 1; font-size: 15px; }
-
-        .footer { font-size: 11px; padding: 8px 30px; color: #444; border-top: 1px solid #111; display: flex; justify-content: space-between; }
+        /* --- HEADER & FOOTER --- */
+        .header { font-size: 14px; font-weight: 900; color: #fff; padding: 5px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .branding { font-size: 11px; text-align: center; color: #333; letter-spacing: 5px; margin-top: 5px; }
 
         @media screen and (orientation: landscape) { body { height: 100vh; width: 100vw; transform: none; top: 0; left: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h1 style="color:#fff; font-size:24px;">C9_UZAIR_STRIKE</h1>
-            <input type="password" id="passkey" placeholder="ACCESS KEY">
-            <button class="btn" style="width:100%" onclick="login()">INITIALIZE</button>
-            <p style="margin-top:15px; font-size:10px; color:var(--accent);">MADE BY C9 UZAIR</p>
+    <div id="login-screen" class="active" style="justify-content:center; align-items:center;">
+        <div style="width:400px; padding:30px; border:2px solid var(--accent); background:var(--panel); text-align:center;">
+            <h1 style="color:#fff; margin-bottom:10px;">C9_UZAIR_STRIKE</h1>
+            <input type="password" id="passkey" placeholder="ACCESS KEY" style="text-align:center;">
+            <button class="btn" style="width:100%" onclick="login()">INITIALIZE SYSTEM</button>
         </div>
     </div>
 
-    <div class="app-container" id="app">
-        <div class="header-bar">
-            <span>C9_STRIKE_V4.0 // <span id="status-tag" style="color:var(--err)">OFFLINE</span></span>
-            <span style="color:var(--accent)">DESIGNED BY C9 UZAIR</span>
+    <div id="infra-screen">
+        <div class="header">
+            <span>UPLINK_SETUP // <span id="infra-stat" style="color:var(--err)">OFFLINE</span></span>
+            <span>MADE BY C9 UZAIR</span>
         </div>
-
-        <div id="scr-1" class="screen active-screen">
-            <div class="log-section" id="log-1">
-                <span style="color:var(--success)">[+] KERNEL_LOADED</span><br>
-                > Manual RDP infrastructure setup required.<br>
-                > Connect to server before launching exploit modules.
+        <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
+            <div class="terminal-box" id="infra-log">
+                <span style="color:var(--success)">[+] KERNEL_LOADED...</span><br>
+                > Manual RDP node required for Evil Twin uplink.
             </div>
-
-            <div class="ctrl-section">
-                <div class="input-box">
-                    <label>TARGET_SERVER_IP</label>
-                    <input type="text" id="ip" value="162.251.10.92">
-                </div>
-                <div class="input-box">
-                    <label>CONNECTION_PORT</label>
-                    <input type="text" value="22">
-                </div>
-                
-                <button class="btn" id="ping-btn" onclick="handleRdp(1)">PING SERVER</button>
-                <button class="btn" id="rsa-btn" onclick="handleRdp(2)">STABLISH RSA LINK</button>
-                
-                <div style="height:20px;"></div> <button class="btn" style="border-color:var(--err); color:var(--err);" onclick="launchEvilTwin()">LAUNCH EVIL TWIN</button>
-                
-                <button class="btn btn-active" id="term-btn" style="display:none;" onclick="showTerminal()">ACCESS REMOTE TERMINAL</button>
+            <div class="side-ctrl">
+                <div class="input-box"><label>REMOTE_IP</label><input type="text" id="ip" value="162.251.10.92"></div>
+                <button class="btn" id="p-btn" onclick="runInfra(1)">PING SERVER</button>
+                <button class="btn" id="r-btn" onclick="runInfra(2)">STABLISH RSA LINK</button>
+                <div style="height:20px;"></div>
+                <button class="btn btn-red" id="launch-btn" onclick="tryLaunch()">LAUNCH EVIL TWIN</button>
             </div>
         </div>
+        <div class="branding">POWERED BY C9 UZAIR</div>
+    </div>
 
-        <div id="scr-2" class="screen">
-            <div class="log-section">
-                <div id="term-out">
-                    <span style="color:var(--accent)">[ REMOTE_TERMINAL_ACTIVE ]</span><br>
-                    > Manual commands authorized.
-                </div>
-                <div class="cmd-line">
-                    <span>uzair@c9:~$</span>
-                    <input type="text" id="cmd-in" onkeydown="handleCmd(event)">
-                </div>
+    <div id="evil-twin-screen">
+        <div class="header">
+            <span style="color:var(--success)">[+] ATTACK_MODULE: EVIL_TWIN</span>
+            <span style="color:var(--warn)">STATION: C9_UZAIR_GHOST</span>
+        </div>
+        <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
+            <div class="terminal-box" id="et-log">
+                <span style="color:var(--warn)">[!] FLUXION FRAMEWORK LOADED.</span><br>
+                > Select an option from the manual menu to begin.
+            </div>
+            <div class="side-ctrl">
+                <button class="btn btn-green" onclick="etAction(1)">[1] SCAN NEARBY WIFI</button>
+                <button class="btn btn-green" onclick="etAction(2)">[2] SELECT TARGET AP</button>
+                <button class="btn btn-green" onclick="etAction(3)">[3] ATTACK & DEAUTH</button>
+                <button class="btn btn-green" onclick="etAction(4)">[4] SPAWN CAPTIVE PORTAL</button>
+                <div style="height:20px;"></div>
+                <button class="btn btn-red" onclick="location.reload()">ABORT MISSION</button>
             </div>
         </div>
-
-        <div class="footer">
-            <span>UPLINK: <span id="uplink-stat">WAITING...</span></span>
-            <span style="font-weight:bold;">POWERED BY C9 UZAIR</span>
-        </div>
+        <div class="branding">DESIGNED BY C9 UZAIR // V5.0</div>
     </div>
 
 <script>
-    let isRdpConnected = false;
-    let isPinged = false;
-
+    let rdpReady = false;
+    let pingDone = false;
     const wait = ms => new Promise(res => setTimeout(res, ms));
 
     function login() {
         if(document.getElementById('passkey').value === "C9") {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app').classList.add('active-app');
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('infra-screen').classList.add('active');
         } else { alert("ACCESS DENIED!"); }
     }
 
-    async function handleRdp(step) {
-        const log = document.getElementById('log-1');
-        const btn = step === 1 ? document.getElementById('ping-btn') : document.getElementById('rsa-btn');
-        
+    async function runInfra(step) {
+        const log = document.getElementById('infra-log');
+        const btn = step === 1 ? document.getElementById('p-btn') : document.getElementById('r-btn');
         btn.classList.add('loading');
-        btn.innerText = "PROCESSING...";
+        btn.innerText = "WAITING...";
 
         if(step === 1) {
-            log.innerHTML += `<br><span style="color:var(--warn)">> Initializing ICMP request to ${document.getElementById('ip').value}...</span>`;
-            await wait(2500); // Forced wait for "loading" feel
-            log.innerHTML += `<br><span style="color:var(--success)">> [REPLY] 32 bytes from node: time=12ms</span>`;
-            isPinged = true;
+            log.innerHTML += `<br>> Pinging ${document.getElementById('ip').value}...`;
+            await wait(2000);
+            log.innerHTML += `<br><span style="color:var(--success)">> Reply: time=11ms [STABLE]</span>`;
+            pingDone = true;
         } else {
-            if(!isPinged) {
-                log.innerHTML += `<br><span style="color:var(--err)">> ERROR: Run PING test before RSA handshaking.</span>`;
-            } else {
-                log.innerHTML += `<br>> Generating RSA-4096 ephemeral keys...`;
-                await wait(3000);
-                log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] Secure tunnel established. UPLINK_STABLE.</span>`;
-                isRdpConnected = true;
-                document.getElementById('status-tag').innerText = "ONLINE";
-                document.getElementById('status-tag').style.color = "var(--success)";
-                document.getElementById('uplink-stat').innerText = "ACTIVE";
-                document.getElementById('term-btn').style.display = 'block';
+            if(!pingDone) { log.innerHTML += `<br><span style="color:var(--err)">> ERROR: ICMP_CHECK_REQUIRED</span>`; }
+            else {
+                log.innerHTML += `<br>> Negotiating RSA Handshake...`;
+                await wait(2500);
+                log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] TUNNEL_ACTIVE.</span>`;
+                rdpReady = true;
+                document.getElementById('infra-stat').innerText = "ONLINE";
+                document.getElementById('infra-stat').style.color = "var(--success)";
             }
         }
-        
         btn.classList.remove('loading');
         btn.innerText = step === 1 ? "PING SERVER" : "STABLISH RSA LINK";
         log.scrollTop = log.scrollHeight;
     }
 
-    function launchEvilTwin() {
-        const log = document.getElementById('log-1');
-        if(!isRdpConnected) {
-            log.innerHTML += `<br><span style="color:var(--err)">[!] CRITICAL ERROR: NO_REMOTE_INFRASTRUCTURE</span>`;
-            log.innerHTML += `<br>> You must establish RSA LINK before launching Evil Twin modules.`;
+    async function tryLaunch() {
+        const log = document.getElementById('infra-log');
+        const btn = document.getElementById('launch-btn');
+        
+        btn.classList.add('loading');
+        btn.innerText = "CHECKING INFRA...";
+        await wait(1500);
+
+        if(!rdpReady) {
+            log.innerHTML += `<br><span style="color:var(--err)">[!] LAUNCH_FAILED: Setup RDP Link First.</span>`;
+            btn.classList.remove('loading');
+            btn.innerText = "LAUNCH EVIL TWIN";
         } else {
-            log.innerHTML += `<br><span style="color:var(--success)">[+] Launching Evil Twin Framework...</span>`;
-            // Add Evil Twin logic here
+            log.innerHTML += `<br><span style="color:var(--success)">> ACCESS_GRANTED. Loading Evil Twin...</span>`;
+            await wait(1000);
+            document.getElementById('infra-screen').classList.remove('active');
+            document.getElementById('evil-twin-screen').classList.add('active');
         }
         log.scrollTop = log.scrollHeight;
     }
 
-    function showTerminal() {
-        document.getElementById('scr-1').style.display = 'none';
-        document.getElementById('scr-2').style.display = 'flex';
-    }
-
-    async function handleCmd(e) {
-        if(e.key === 'Enter') {
-            const val = document.getElementById('cmd-in').value;
-            const out = document.getElementById('term-out');
-            out.innerHTML += `<br><span style="color:var(--success)">uzair@c9:~$ ${val}</span>`;
-            document.getElementById('cmd-in').value = '';
-            out.scrollTop = out.scrollHeight;
+    async function etAction(opt) {
+        const etLog = document.getElementById('et-log');
+        if(opt === 1) {
+            etLog.innerHTML += `<br><span style="color:var(--accent)">> Scanning nearby airwaves...</span>`;
+            await wait(2000);
+            ["C9_SECURE", "PTCL-WIFI", "TP-LINK_EXT", "Mobile_92"].forEach(n => {
+                etLog.innerHTML += `<br>FOUND: [${n}] - CH: ${Math.floor(Math.random()*11)} - PWR: -${Math.floor(Math.random()*40+30)}dBm`;
+            });
+        } else if(opt === 2) {
+            etLog.innerHTML += `<br>> TARGET_SET: [C9_SECURE] - MAC: 00:AF:E2:91`;
+        } else if(opt === 3) {
+            etLog.innerHTML += `<br><span style="color:var(--err)">> Starting Deauthentication packets...</span>`;
+            await wait(1500);
+            etLog.innerHTML += `<br><span style="color:var(--success)">> Handshake Captured: C9_SECURE.cap</span>`;
+        } else if(opt === 4) {
+            etLog.innerHTML += `<br><span style="color:var(--accent)">> Hosting Fake DNS & Portal on 192.168.1.1...</span>`;
+            await wait(2000);
+            etLog.innerHTML += `<br><span style="color:var(--success)">> [!] VICTIM ENTERED PASSWORD: **********</span>`;
         }
+        etLog.scrollTop = etLog.scrollHeight;
     }
 </script>
 </body>
