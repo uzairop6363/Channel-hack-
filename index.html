@@ -8,7 +8,7 @@
         :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1e242d; --err: #ff4757; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
         
-        /* FIXED SCREEN FIT */
+        /* THE ABSOLUTE FIX: No scroll, full fit */
         body { 
             background: var(--bg); color: var(--text); 
             height: 100vw; width: 100vh; overflow: hidden; 
@@ -16,27 +16,28 @@
             transform: translate(-50%, -50%) rotate(90deg); transform-origin: center;
         }
 
-        .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; padding: 8px; }
+        .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; padding: 5px; overflow: hidden; }
 
-        .screen { display: none; flex-direction: column; height: 100%; gap: 8px; overflow: hidden; }
+        .screen { display: none; flex-direction: column; height: 100%; gap: 5px; overflow: hidden; }
         .active-screen { display: flex !important; }
 
-        /* Compact Layout for Mobile Screens */
-        .terminal-box { flex: 1; background: #020305; border: 1px solid var(--border); padding: 8px; font-size: 9px; color: #57606f; overflow-y: auto; line-height: 1.2; }
-        .input-group { background: var(--panel); border: 1px solid var(--border); padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        /* ULTRA COMPACT UI */
+        .terminal-box { flex: 1; background: #000; border: 1px solid var(--border); padding: 5px; font-size: 8px; color: #57606f; overflow-y: auto; line-height: 1.1; margin-bottom: 2px; }
+        .input-grid { background: var(--panel); border: 1px solid var(--border); padding: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 2px; }
         
-        label { font-size: 8px; color: var(--accent); text-transform: uppercase; margin-bottom: 2px; display: block; }
-        input { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 5px; font-size: 10px; outline: none; }
+        label { font-size: 7px; color: var(--accent); text-transform: uppercase; margin-bottom: 1px; display: block; }
+        input { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 3px; font-size: 9px; outline: none; }
         
-        .btn-row { display: flex; gap: 5px; margin-top: auto; }
-        .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px; cursor: pointer; text-transform: uppercase; font-size: 9px; font-weight: bold; flex: 1; }
+        .btn-row { display: flex; gap: 4px; margin-top: auto; padding-bottom: 2px; }
+        .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 4px; cursor: pointer; text-transform: uppercase; font-size: 8px; font-weight: bold; flex: 1; min-height: 30px; }
         .btn:disabled { border-color: #222; color: #222; opacity: 0.5; }
-        .btn-active { background: var(--accent); color: #000; }
+        .btn-active { background: var(--accent); color: #000; border: none; }
 
-        .loader-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        .spinner { width: 30px; height: 30px; border: 2px solid #111; border-top: 2px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        .loader-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { width: 25px; height: 25px; border: 2px solid #111; border-top: 2px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
         .blink { animation: blinker 1.5s infinite; }
         @keyframes blinker { 50% { opacity: 0.2; } }
 
@@ -47,52 +48,50 @@
 
     <div id="loader" class="loader-overlay">
         <div class="spinner"></div>
-        <div id="loader-text" style="margin-top:10px; font-size:9px; color:var(--accent);" class="blink">NEGOTIATING_UPLINK...</div>
+        <div id="loader-text" style="margin-top:8px; font-size:8px; color:var(--accent);" class="blink">LOADING...</div>
     </div>
 
     <div class="app-container">
         <div id="scr-1" class="screen active-screen">
-            <h4 style="font-size:10px; color:#fff; letter-spacing:1px;">[01] REMOTE_INFRA_CONFIG</h4>
-            <div class="input-group">
-                <div><label>Server IP</label><input type="text" value="162.251.10.92"></div>
-                <div><label>SSH Port</label><input type="text" value="22"></div>
-                <div><label>Protocol</label><input type="text" value="RSA-4096 / AES" readonly></div>
-                <div><label>Cluster</label><input type="text" value="FRA-NODE-09" readonly></div>
+            <h4 style="font-size:9px; color:#fff; border-bottom:1px solid #222; padding-bottom:2px;">C9_REMOTE_V1.8_INFRA</h4>
+            <div class="input-grid">
+                <div><label>IP</label><input type="text" value="162.251.10.92"></div>
+                <div><label>PORT</label><input type="text" value="22"></div>
+                <div><label>RSA</label><input type="text" value="4096-BIT" readonly></div>
+                <div><label>NODE</label><input type="text" value="FRA-09" readonly></div>
             </div>
-            <div class="terminal-box" id="log-1">> Awaiting manual initialization...</div>
+            <div class="terminal-box" id="log-1">> SYSTEM_READY. Awaiting manual build...</div>
             <div class="btn-row">
-                <button class="btn" id="b1" onclick="runStep1(1)">PING SERVER</button>
-                <button class="btn" id="b2" onclick="runStep1(2)" disabled>GEN_KEYS</button>
+                <button class="btn" id="b1" onclick="runStep1(1)">PING</button>
+                <button class="btn" id="b2" onclick="runStep1(2)" disabled>GEN_KEY</button>
                 <button class="btn" id="b3" onclick="runStep1(3)" disabled>SSH_LINK</button>
-                <button class="btn btn-active" id="next-1" style="display:none;" onclick="goTo(2)">TERMINAL</button>
+                <button class="btn btn-active" id="next-1" style="display:none;" onclick="goTo(2)">ACCESS_TERMINAL</button>
             </div>
         </div>
 
         <div id="scr-2" class="screen">
-            <h4 style="font-size:10px; color:#fff;">[02] HARDWARE_HAL_MOUNT</h4>
-            <div style="display:grid; grid-template-columns: 180px 1fr; gap:8px; flex:1; overflow:hidden;">
-                <div style="background:var(--panel); border:1px solid var(--border); padding:10px; display:flex; flex-direction:column; gap:8px; align-items:center;">
-                    <div style="width:100px; height:100px; border:1px solid #1a1a1a; border-radius:50%; position:relative; overflow:hidden;">
+            <h4 style="font-size:9px; color:#fff;">UPLINK_CENTER // wlan0mon</h4>
+            <div style="display:grid; grid-template-columns: 140px 1fr; gap:5px; flex:1; overflow:hidden;">
+                <div style="background:var(--panel); border:1px solid var(--border); padding:5px; display:flex; flex-direction:column; gap:5px; align-items:center;">
+                    <div style="width:60px; height:60px; border:1px solid #1a1a1a; border-radius:50%; position:relative; overflow:hidden;">
                         <div style="width:50%; height:1px; background:var(--accent); position:absolute; top:50%; left:50%; transform-origin:left; animation: rotate 4s linear infinite;"></div>
                     </div>
-                    <button class="btn" id="mount-btn" onclick="runStep2(1)">MOUNT</button>
-                    <button class="btn" id="scan-btn" onclick="runStep2(2)" disabled>SCAN</button>
+                    <button class="btn" id="mount-btn" onclick="runStep2(1)" style="width:100%">MOUNT</button>
+                    <button class="btn" id="scan-btn" onclick="runStep2(2)" disabled style="width:100%">SCAN</button>
                 </div>
-                <div class="terminal-box" id="target-list">
-                    <p style="text-align:center; margin-top:50px; opacity:0.3;">[ HW_NULL ]</p>
-                </div>
+                <div class="terminal-box" id="target-list"><p style="text-align:center; margin-top:30px; opacity:0.3;">[ HW_NULL ]</p></div>
             </div>
         </div>
 
         <div id="scr-3" class="screen">
-            <h4 style="font-size:10px; color:#fff;">[03] GPU_CLUSTER_CRACK</h4>
+            <h4 style="font-size:9px; color:#fff;">GPU_DECRYPTION_CLUSTER</h4>
             <div class="terminal-box" id="log-3">> Handshake: C9_PRO_PACKET.cap</div>
-            <div class="input-group">
+            <div class="input-grid">
                 <button class="btn" id="d1" onclick="runStep3(1)">ALLOC_CUDA</button>
                 <button class="btn" id="d2" onclick="runStep3(2)" disabled>START_BRUTE</button>
             </div>
-            <div id="crack-status" style="display:none; padding:10px; background:#000; border:1px solid var(--border);">
-                <div style="font-size:9px; display:flex; justify-content:space-between; margin-bottom:4px;"><span>SPEED: 21.4M p/s</span><span id="p-val">0%</span></div>
+            <div id="crack-status" style="display:none; padding:8px; background:#000; border:1px solid var(--border);">
+                <div style="font-size:8px; display:flex; justify-content:space-between; margin-bottom:2px;"><span>21.4M p/s</span><span id="p-val">0%</span></div>
                 <div style="width:100%; height:2px; background:#111;"><div id="p-bar" style="width:0%; height:100%; background:var(--accent);"></div></div>
             </div>
         </div>
@@ -115,16 +114,16 @@
 
     async function runStep1(s) {
         if(s===1) {
-            await showLoading("PINGING SERVER...", 1500);
-            writeLog('log-1', "Reply from Node: bytes=32 time=12ms", "#fff");
+            await showLoading("PINGING...", 1000);
+            writeLog('log-1', "Reply: 32 bytes time=12ms", "#fff");
             document.getElementById('b1').disabled = true; document.getElementById('b2').disabled = false;
         } else if(s===2) {
-            await showLoading("GEN_KEYS...", 2000);
-            writeLog('log-1', "RSA-4096 Key Generated.", "#00d4ff");
+            await showLoading("GEN_KEYS...", 1500);
+            writeLog('log-1', "RSA-4096 Key Ready.", "#00d4ff");
             document.getElementById('b2').disabled = true; document.getElementById('b3').disabled = false;
         } else if(s===3) {
-            await showLoading("SSH_HANDSHAKE...", 2000);
-            writeLog('log-1', "Tunnel Active: AES-256-GCM", "#00ff88");
+            await showLoading("SSH_LINK...", 1500);
+            writeLog('log-1', "Uplink Active: AES-256", "#00ff88");
             document.getElementById('b3').style.display = 'none'; document.getElementById('next-1').style.display = 'block';
         }
     }
@@ -136,14 +135,14 @@
 
     async function runStep2(s) {
         if(s===1) {
-            await showLoading("MOUNTING_HAL...", 2000);
-            writeLog('target-list', "rtl8812au mounted.", "#00d4ff");
+            await showLoading("MOUNTING...", 1500);
+            writeLog('target-list', "rtl8812au OK.", "#00d4ff");
             document.getElementById('mount-btn').disabled = true; document.getElementById('scan-btn').disabled = false;
         } else if(s===2) {
-            await showLoading("SCANNING...", 3000);
+            await showLoading("SCANNING...", 2500);
             document.getElementById('target-list').innerHTML = `
-                <div style="background:#111; border:1px solid #222; padding:10px; display:flex; justify-content:space-between; cursor:pointer;" onclick="goTo(3)">
-                    <div><b>C9_PRO_SECURE</b><br><small>BSSID: 00:AF:E2</small></div>
+                <div style="background:#111; border:1px solid #222; padding:8px; display:flex; justify-content:space-between; cursor:pointer;" onclick="goTo(3)">
+                    <div><b>C9_PRO_SECURE</b><br><small>BSSID: 00:AF</small></div>
                     <div style="color:var(--accent)">-38dBm</div>
                 </div>`;
         }
@@ -151,22 +150,21 @@
 
     async function runStep3(s) {
         if(s===1) {
-            await showLoading("SYNCING_GPU...", 2000);
-            writeLog('log-3', "A100_NODES: ACTIVE", "#00d4ff");
+            await showLoading("SYNCING...", 1500);
+            writeLog('log-3', "CUDA_NODES: ACTIVE", "#00d4ff");
             document.getElementById('d1').disabled = true; document.getElementById('d2').disabled = false;
         } else if(s===2) {
             document.getElementById('d2').disabled = true;
             document.getElementById('crack-status').style.display = 'block';
             for(let i=0; i<=95; i+=5) {
-                await wait(1000);
+                await wait(800);
                 document.getElementById('p-bar').style.width = i + "%";
                 document.getElementById('p-val').innerText = i + "%";
                 writeLog('log-3', `0x${i}: NO_MATCH`);
             }
-            writeLog('log-3', "ERR: CLUSTER_EXHAUSTED", "#ff4757");
+            writeLog('log-3', "ERR: EXHAUSTED", "#ff4757");
         }
     }
 </script>
-<style> @keyframes rotate { 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
