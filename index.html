@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_STABLE_V1.8_FINAL</title>
+    <title>C9_UZAIR_ULTIMATE</title>
     <style>
-        :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --err: #ff4757; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', 'Courier New', monospace; }
+        :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --success: #00ff88; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
         
         body { 
             background: var(--bg); color: var(--text); 
@@ -15,62 +15,58 @@
             transform: translate(-50%, -50%) rotate(90deg); transform-origin: center;
         }
 
-        .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; padding: 10px; overflow: hidden; }
-        
-        /* HEADER - Added Left Margin & Bigger Text */
-        .header-bar { 
-            font-size: 14px; 
-            font-weight: bold;
-            color: #fff; 
-            padding: 5px 25px; /* Added 25px padding from left */
-            border-bottom: 1px solid var(--border); 
-            margin-bottom: 5px;
-            letter-spacing: 1px;
+        /* --- LOGIN SYSTEM --- */
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .login-box {
+            width: 350px; padding: 30px; border: 1px solid var(--accent); background: var(--panel);
+            text-align: center; box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
         }
 
-        .screen { display: none; height: 100%; width: 100%; gap: 8px; overflow: hidden; }
+        /* --- MAIN APP --- */
+        .app-container { display: none; flex-direction: column; height: 100%; width: 100%; padding: 10px; overflow: hidden; }
+        .active-app { display: flex !important; }
+
+        .header-bar { 
+            font-size: 15px; font-weight: 900; color: #fff; padding: 8px 30px;
+            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+        }
+
+        .screen { display: none; height: 100%; width: 100%; gap: 10px; padding-top: 10px; }
         .active-screen { display: flex !important; }
 
-        /* SPLIT LAYOUT - Added Safe Margins */
+        /* --- UI ELEMENTS --- */
         .log-section { 
-            flex: 1.1; 
-            background: #000; 
-            border: 0.5px solid var(--border); 
-            padding: 15px 25px; /* Text thora agay shift kar diya */
-            font-size: 13px; /* Bigger terminal text */
-            color: #57606f; 
-            overflow-y: auto; 
-            line-height: 1.4; 
-            height: 90%; 
+            flex: 1.2; background: #000; border: 1px solid var(--border); 
+            padding: 20px 30px; font-size: 14px; color: #fff; 
+            overflow-y: auto; line-height: 1.5; box-shadow: inset 0 0 10px #000;
         }
 
-        .ctrl-section { flex: 1; display: flex; flex-direction: column; gap: 8px; height: 90%; padding-right: 10px; }
+        .ctrl-section { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
-        .input-box-alt { background: var(--panel); border: 0.5px solid var(--border); padding: 8px; }
-        label { font-size: 10px; color: var(--accent); display: block; margin-bottom: 4px; font-weight: bold; }
-        input { width: 100%; background: #000; border: 0.5px solid #333; color: #fff; padding: 10px; font-size: 14px; font-weight: bold; outline: none; }
-        
-        /* ACTION BUTTONS - High Visibility */
+        .input-box { background: var(--panel); border: 1px solid var(--border); padding: 10px; }
+        label { font-size: 11px; color: var(--accent); display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; background: #000; border: 1px solid #333; color: var(--success); padding: 12px; font-size: 15px; font-weight: bold; outline: none; }
+
+        /* --- ANIMATED BUTTONS --- */
         .btn { 
-            background: none; 
-            border: 2px solid var(--accent); 
-            color: var(--accent); 
-            padding: 18px 5px; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-size: 13px; 
-            font-weight: 900; 
-            width: 100%; 
-            margin-top: auto; 
-            letter-spacing: 2px;
-            transition: 0.2s;
+            background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); 
+            color: var(--accent); padding: 18px 5px; cursor: pointer; 
+            text-transform: uppercase; font-size: 14px; font-weight: 900; 
+            transition: all 0.1s ease; letter-spacing: 2px; position: relative;
+            overflow: hidden;
         }
-        .btn:disabled { border-color: #222; color: #222; opacity: 0.3; }
+        .btn:active { transform: scale(0.96); background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
+        
         .btn-active { background: var(--accent); color: #000; border: none; }
 
-        /* LOADER OVERLAY */
-        .loader-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        .spinner { width: 40px; height: 40px; border: 3px solid #111; border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        /* --- FOOTER / BRANDING --- */
+        .footer { font-size: 10px; padding: 5px 30px; color: #444; display: flex; justify-content: space-between; border-top: 1px solid #111; }
+
+        .loader-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { width: 50px; height: 50px; border: 3px solid #111; border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
@@ -82,72 +78,90 @@
 </head>
 <body>
 
-    <div id="loader" class="loader-overlay">
-        <div class="spinner"></div>
-        <div id="loader-text" style="margin-top:15px; font-size:12px; color:var(--accent);" class="blink">NEGOTIATING_UPLINK...</div>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:#fff; margin-bottom:10px; font-size:18px;">C9_SECURITY_GATE</h2>
+            <p style="font-size:10px; color:var(--accent); margin-bottom:20px;">AUTHORIZED PERSONNEL ONLY</p>
+            <label style="text-align:left;">ENTER ACCESS KEY</label>
+            <input type="password" id="access-key" placeholder="••••••••" style="text-align:center; margin-bottom:20px;">
+            <button class="btn" onclick="checkLogin()" style="width:100%">INITIALIZE SYSTEM</button>
+            <p style="margin-top:15px; font-size:10px;">MADE BY <span style="color:var(--accent)">C9 UZAIR</span></p>
+        </div>
     </div>
 
-    <div class="app-container">
-        <div class="header-bar">C9_HARD_LINK_STABLE_V1.8 // <span style="color:var(--accent)">MODE: RDP_MANUAL</span></div>
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <div id="loader-text" style="margin-top:15px; font-size:12px; color:var(--accent);" class="blink">AUTHENTICATING...</div>
+    </div>
+
+    <div class="app-container" id="main-app">
+        <div class="header-bar">
+            <span>C9_HARD_LINK_STABLE_V1.8</span>
+            <span style="color:var(--accent)">DEV: C9 UZAIR</span>
+        </div>
 
         <div id="scr-1" class="screen active-screen">
             <div class="log-section" id="log-1">
-                <span style="color:var(--accent)">> SYSTEM_READY.</span><br>
-                > Awaiting manual build sequence...<br>
-                > Remote IP locked: 162.251.10.92
+                <span style="color:var(--success)">[ SYSTEM_CORE_LOADED ]</span><br>
+                > User: C9_UZAIR_ADMIN<br>
+                > Status: Awaiting RDP Configuration...
             </div>
             
             <div class="ctrl-section">
-                <div class="input-box-alt">
-                    <label>SERVER_IP_UPLINK</label><input type="text" value="162.251.10.92">
+                <div class="input-box">
+                    <label>REMOTE_UPLINK_IP</label><input type="text" value="162.251.10.92">
                 </div>
-                <div class="input-box-alt">
-                    <label>SSH_TUNNEL_PORT</label><input type="text" value="22">
+                <div class="input-box">
+                    <label>ENCRYPTION_LAYER</label><input type="text" value="RSA-4096 / AES-256" readonly>
                 </div>
-                <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                    <button class="btn" id="b1" onclick="runStep1(1)">PING SERVER</button>
-                    <button class="btn" id="b2" onclick="runStep1(2)" disabled>GENERATE KEY</button>
-                    <button class="btn" id="b3" onclick="runStep1(3)" disabled>ESTABLISH LINK</button>
-                    <button class="btn btn-active" id="next-1" style="display:none;" onclick="goTo(2)">ACCESS TERMINAL</button>
+                <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
+                    <button class="btn" onclick="runStep1(1)">PING SERVER</button>
+                    <button class="btn" onclick="runStep1(2)">GENERATE KEYS</button>
+                    <button class="btn" onclick="runStep1(3)">ESTABLISH LINK</button>
+                    <button class="btn btn-active" id="next-1" style="display:none;" onclick="goTo(2)">PROCEED TO TERMINAL</button>
                 </div>
             </div>
         </div>
 
         <div id="scr-2" class="screen">
             <div class="log-section" id="target-list">
-                <span style="color:var(--accent)">[ HARDWARE_STATUS: OK ]</span><br>
-                > Waiting for mount command...
+                <span style="color:var(--accent)">> C9_UZAIR_HAL_SYSTEM</span><br>
+                > Interface wlan0mon detected.
             </div>
             <div class="ctrl-section">
-                <div style="background:var(--panel); border:0.5px solid var(--border); padding:15px; display:flex; justify-content:center; align-items:center; flex:1;">
-                    <div style="width:90px; height:90px; border:2px solid var(--accent); border-radius:50%; position:relative; overflow:hidden;">
-                        <div style="width:50%; height:2px; background:var(--accent); position:absolute; top:50%; left:50%; transform-origin:left; animation: rotate 4s linear infinite;"></div>
+                <div style="background:var(--panel); border:1px solid var(--border); display:flex; justify-content:center; align-items:center; flex:1;">
+                    <div style="width:100px; height:100px; border:2px solid var(--accent); border-radius:50%; position:relative; overflow:hidden;">
+                        <div style="width:50%; height:3px; background:var(--accent); position:absolute; top:50%; left:50%; transform-origin:left; animation: rotate 3s linear infinite;"></div>
                     </div>
                 </div>
-                <button class="btn" id="mount-btn" onclick="runStep2(1)">MOUNT wlan0mon</button>
-                <button class="btn" id="scan-btn" onclick="runStep2(2)" disabled>START SCAN</button>
+                <button class="btn" onclick="runStep2(1)">MOUNT INTERFACE</button>
+                <button class="btn" onclick="runStep2(2)">SCAN NETWORK</button>
             </div>
         </div>
 
-        <div id="scr-3" class="screen">
-            <div class="log-section" id="log-3">
-                > Handshake Captured: 0x01.cap<br>
-                > GPU Nodes Assigned: 4/4
-            </div>
-            <div class="ctrl-section">
-                <button class="btn" id="d1" onclick="runStep3(1)">ALLOC_CUDA</button>
-                <button class="btn" id="d2" onclick="runStep3(2)" disabled>BRUTE_FORCE</button>
-                <div id="crack-status" style="display:none; padding:15px; background:#000; border:1px solid var(--border);">
-                    <div style="font-size:12px; display:flex; justify-content:space-between; margin-bottom:5px;"><span>SPEED: 21.4M/s</span><span id="p-val">0%</span></div>
-                    <div style="width:100%; height:6px; background:#111;"><div id="p-bar" style="width:0%; height:100%; background:var(--accent);"></div></div>
-                </div>
-            </div>
+        <div class="footer">
+            <span>SECURE CONNECTION: AES_GCM</span>
+            <span style="font-weight:bold;">POWERED BY C9 UZAIR</span>
         </div>
     </div>
 
 <script>
     const wait = ms => new Promise(res => setTimeout(res, ms));
-    const writeLog = (id, msg, col="#57606f") => {
+    
+    // LOGIN LOGIC
+    function checkLogin() {
+        const key = document.getElementById('access-key').value;
+        if(key === "C9") { // Yahan aap apni pasand ki key rakh sakte hain
+            showLoading("ACCESS GRANTED...", 1500).then(() => {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').classList.add('active-app');
+            });
+        } else {
+            alert("INVALID ACCESS KEY! ACCESS DENIED.");
+        }
+    }
+
+    const writeLog = (id, msg, col="#fff") => {
         const b = document.getElementById(id);
         b.innerHTML += `<br><span style="color:${col}">> ${msg}</span>`;
         b.scrollTop = b.scrollHeight;
@@ -162,17 +176,15 @@
 
     async function runStep1(s) {
         if(s===1) {
-            await showLoading("PINGING SERVER...", 1200);
-            writeLog('log-1', "Reply: bytes=32 time=12ms TTL=54", "#fff");
-            document.getElementById('b1').style.opacity = "0.2"; document.getElementById('b2').disabled = false;
+            await showLoading("PINGING REMOTE NODE...", 1000);
+            writeLog('log-1', "Node Response: 12ms [STABLE]", "#00ff88");
         } else if(s===2) {
-            await showLoading("GENERATING RSA...", 1500);
-            writeLog('log-1', "RSA-4096 Pair Ready.", "#00d4ff");
-            document.getElementById('b2').style.opacity = "0.2"; document.getElementById('b3').disabled = false;
+            await showLoading("RSA_GEN_4096...", 1200);
+            writeLog('log-1', "Key Fingerprint: SHA256:C9_UZAIR_SEC", "#00d4ff");
         } else if(s===3) {
-            await showLoading("ESTABLISHING LINK...", 2000);
-            writeLog('log-1', "SECURE_UPLINK: ACTIVE", "#00ff88");
-            document.getElementById('b3').style.display = 'none'; document.getElementById('next-1').style.display = 'block';
+            await showLoading("ENCRYPTING TUNNEL...", 1500);
+            writeLog('log-1', "TUNNEL_READY: Link established.", "#00ff88");
+            document.getElementById('next-1').style.display = 'block';
         }
     }
 
@@ -183,34 +195,14 @@
 
     async function runStep2(s) {
         if(s===1) {
-            await showLoading("MOUNTING_HAL...", 1500);
-            writeLog('target-list', "wlan0mon interface active.", "#00d4ff");
-            document.getElementById('mount-btn').disabled = true; document.getElementById('scan-btn').disabled = false;
+            await showLoading("MOUNTING...", 1200);
+            writeLog('target-list', "UZAIR_DRV: RTL8812AU MOUNTED", "#00ff88");
         } else if(s===2) {
-            await showLoading("SCANNING AIRWAVES...", 2500);
-            document.getElementById('target-list').innerHTML = `
-                <div style="background:#111; border:1px solid #222; padding:20px; display:flex; justify-content:space-between; cursor:pointer;" onclick="goTo(3)">
-                    <div><b style="font-size:14px;">C9_ENTERPRISE_SECURE</b><br><small>BSSID: 00:AF:E2:91</small></div>
-                    <div style="color:var(--accent); font-weight:bold;">-38dBm</div>
+            await showLoading("SCANNING...", 2000);
+            document.getElementById('target-list').innerHTML += `
+                <div style="background:#111; border:1px solid #222; padding:15px; margin-top:10px; color:var(--accent); font-weight:bold;">
+                    TARGET: C9_ENTERPRISE [-32dBm]
                 </div>`;
-        }
-    }
-
-    async function runStep3(s) {
-        if(s===1) {
-            await showLoading("ALLOCATING CORES...", 1500);
-            writeLog('log-3', "CUDA_CORES: ONLINE [4x A100]", "#00d4ff");
-            document.getElementById('d1').disabled = true; document.getElementById('d2').disabled = false;
-        } else if(s===2) {
-            document.getElementById('d2').disabled = true;
-            document.getElementById('crack-status').style.display = 'block';
-            for(let i=0; i<=95; i+=5) {
-                await wait(800);
-                document.getElementById('p-bar').style.width = i + "%";
-                document.getElementById('p-val').innerText = i + "%";
-                writeLog('log-3', `Testing Hash: 0x${i}FF... NO_MATCH`);
-            }
-            writeLog('log-3', "CRITICAL: CLUSTER_EXHAUSTED", "#ff4757");
         }
     }
 </script>
