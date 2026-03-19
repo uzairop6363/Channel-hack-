@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_UZAIR_FINAL_V8</title>
+    <title>C9_UZAIR_STRIKE_FIXED</title>
     <style>
         :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --success: #00ff88; --warn: #ffcc00; --err: #ff4757; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
@@ -23,31 +23,27 @@
         .spinner { width: 50px; height: 50px; border: 3px solid #111; border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- SCREENS --- */
         .screen { position: fixed; inset: 0; display: none; flex-direction: column; padding: 10px; }
         .active { display: flex !important; }
 
-        /* --- UI ELEMENTS --- */
+        /* --- TERMINAL & LIST --- */
         .terminal-box { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px; font-size: 14px; color: #fff; overflow-y: auto; line-height: 1.6; }
-        .side-ctrl { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+        .side-ctrl { flex: 1; display: flex; flex-direction: column; gap: 8px; }
         
+        #wifi-container { margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
         .wifi-item { 
-            background: #0a0c10; border: 1px solid #222; padding: 15px; cursor: pointer; 
-            margin-top: 5px; color: var(--accent); transition: 0.2s;
+            background: #0a0c10; border: 1px solid #333; padding: 15px; cursor: pointer; 
+            margin-bottom: 8px; color: var(--accent); font-weight: bold; border-radius: 4px;
         }
-        .wifi-item:hover { border-color: var(--accent); }
-        .wifi-selected { border-color: var(--success) !important; color: var(--success) !important; background: rgba(0, 255, 136, 0.05); }
+        .wifi-item:active { background: var(--accent); color: #000; }
+        .wifi-selected { border-color: var(--success) !important; color: var(--success) !important; background: rgba(0, 255, 136, 0.1) !important; box-shadow: 0 0 10px rgba(0,255,136,0.2); }
 
-        .btn { 
-            background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); 
-            padding: 16px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 900; 
-        }
-        .btn:active { transform: scale(0.95); background: var(--accent); color: #000; }
-        .btn:disabled { opacity: 0.2; pointer-events: none; }
+        .btn { background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); padding: 16px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 900; }
+        .btn:disabled { opacity: 0.1; pointer-events: none; }
 
         .header { font-size: 13px; padding: 8px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; margin-bottom: 5px; }
         .footer { font-size: 9px; text-align: center; color: #333; letter-spacing: 5px; padding: 5px; }
-        .c9-glow { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .c9-glow { color: var(--accent); text-shadow: 0 0 10px var(--accent); font-weight: 900; }
 
         @media screen and (orientation: landscape) { body { height: 100vh; width: 100vw; transform: none; top: 0; left: 0; } }
     </style>
@@ -71,12 +67,12 @@
     <div id="scr-1" class="screen">
         <div class="header"><span>RDP_UPLINK // <span id="stat" style="color:var(--err)">OFFLINE</span></span><span class="c9-glow">C9 UZAIR</span></div>
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
-            <div class="terminal-box" id="log-1">> Awaiting manual configuration...</div>
+            <div class="terminal-box" id="log-1">> Awaiting manual build...</div>
             <div class="side-ctrl">
-                <input type="text" id="ip" value="162.251.10.92" style="background:var(--panel); border:1px solid var(--border); color:#fff; padding:12px; margin-bottom:10px;">
+                <input type="text" id="ip" value="162.251.10.92" style="background:var(--panel); border:1px solid var(--border); color:#fff; padding:12px;">
                 <button class="btn" onclick="runPing()">PING SERVER</button>
                 <button class="btn" onclick="runRSA()">ESTABLISH RSA</button>
-                <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="showLoader('LOADING ATTACK MODULE...', 2)">LAUNCH EXPLOIT</button>
+                <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="showLoader('SYNCHRONIZING EXPLOIT...', 2)">LAUNCH HACK</button>
             </div>
         </div>
         <div class="footer">MADE BY C9 UZAIR</div>
@@ -87,8 +83,8 @@
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
             <div class="terminal-box" id="log-2">
                 <span style="color:var(--success)">[+] TERMINAL_READY.</span><br>
-                > Click 'SCAN TARGETS' to list nearby networks.
-                <div id="wifi-list" style="margin-top:15px;"></div>
+                > Awaiting target scan...
+                <div id="wifi-container"></div>
             </div>
             <div class="side-ctrl">
                 <button class="btn" onclick="scanWifi()">[1] SCAN TARGETS</button>
@@ -106,13 +102,10 @@
 
     async function showLoader(text, next) {
         if(next === 1 && document.getElementById('key').value !== "C9") { alert("WRONG KEY!"); return; }
-        
         const loader = document.getElementById('global-loader');
         document.getElementById('loader-text').innerText = text;
         loader.style.display = 'flex';
-        
-        await wait(2500); // 2.5 Sec loading delay
-        
+        await wait(2500); 
         loader.style.display = 'none';
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(`scr-${next}`).classList.add('active');
@@ -122,14 +115,14 @@
         const l = document.getElementById('log-1');
         l.innerHTML += `<br>> Pinging ${document.getElementById('ip').value}...`;
         await wait(1500);
-        l.innerHTML += `<br><span style="color:var(--success)">> [REPLY] time=14ms</span>`;
+        l.innerHTML += `<br><span style="color:var(--success)">> [REPLY] time=12ms</span>`;
     }
 
     async function runRSA() {
         const l = document.getElementById('log-1');
-        l.innerHTML += `<br>> Generating RSA keys...`;
+        l.innerHTML += `<br>> Linking RSA-4096...`;
         await wait(2000);
-        l.innerHTML += `<br><span style="color:var(--accent)">> [STABLE] Uplink Established.</span>`;
+        l.innerHTML += `<br><span style="color:var(--accent)">> [STABLE] Link Established.</span>`;
         rdpOk = true;
         document.getElementById('stat').innerText = "ONLINE";
         document.getElementById('stat').style.color = "var(--success)";
@@ -137,38 +130,39 @@
 
     async function scanWifi() {
         const l = document.getElementById('log-2');
-        const list = document.getElementById('wifi-list');
-        l.innerHTML += `<br><span style="color:var(--warn)">> Scanning airwaves (Real-Time)...</span>`;
+        const container = document.getElementById('wifi-container');
+        
+        // Clear previous logs to show WiFi names clearly
+        l.innerHTML = `<span style="color:var(--warn)">> Scanning airwaves (Real-Time)...</span>`;
         await wait(2000);
         
-        const nets = ["PTCL-BB-92", "C9_GUEST_SECURE", "TP-LINK_EXT"];
-        list.innerHTML = "";
-        nets.forEach(n => {
+        const networks = ["PTCL-BB-92", "C9_GUEST_SECURE", "TP-LINK_EXT", "Telenor_4G"];
+        container.innerHTML = `<p style="font-size:10px; color:#555; margin-bottom:10px;">SELECT A TARGET TO CONTINUE:</p>`;
+        
+        networks.forEach(n => {
             const div = document.createElement('div');
             div.className = "wifi-item";
-            div.innerText = `${n} [PWR: -${Math.floor(Math.random()*40+30)}dBm]`;
-            div.onclick = () => selectNet(div, n);
-            list.appendChild(div);
+            div.innerText = `[TARGET] ${n} -- PWR: -${Math.floor(Math.random()*30+30)}dBm`;
+            div.onclick = () => {
+                document.querySelectorAll('.wifi-item').forEach(i => i.classList.remove('wifi-selected'));
+                div.classList.add('wifi-selected');
+                target = n;
+                l.innerHTML += `<br><span style="color:var(--success)">> Selected: ${n}</span>`;
+                document.getElementById('btn-h').disabled = false;
+            };
+            container.appendChild(div);
         });
-    }
-
-    function selectNet(el, name) {
-        document.querySelectorAll('.wifi-item').forEach(i => i.classList.remove('wifi-selected'));
-        el.classList.add('wifi-selected');
-        target = name;
-        document.getElementById('log-2').innerHTML += `<br><span style="color:var(--success)">> Target Selected: [${name}]</span>`;
-        document.getElementById('btn-h').disabled = false;
     }
 
     async function runHack() {
         const l = document.getElementById('log-2');
-        l.innerHTML += `<br><span style="color:var(--err)">> Injecting deauth packets into ${target}...</span>`;
+        document.getElementById('wifi-container').style.display = 'none';
+        l.innerHTML += `<br><span style="color:var(--err)">> Deauthenticating ${target}...</span>`;
         await wait(3000);
-        l.innerHTML += `<br><span style="color:var(--success)">> Handshake Captured. Cracking Hash...</span>`;
+        l.innerHTML += `<br><span style="color:var(--success)">> Handshake Captured! Cracking...</span>`;
         await wait(2000);
-        l.innerHTML += `<br><br><span class="c9-glow" style="font-size:18px;">PASSWORD FOUND: uzair_admin_92</span>`;
+        l.innerHTML += `<br><br><span class="c9-glow" style="font-size:18px;">KEY_FOUND: uzair_92_pass</span>`;
         l.innerHTML += `<br><span style="color:var(--accent)">[!] SYSTEM BREACHED BY C9 UZAIR.</span>`;
-        l.scrollTop = l.scrollHeight;
     }
 </script>
 </body>
