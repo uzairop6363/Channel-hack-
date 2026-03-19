@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_UZAIR_STRIKE_V6</title>
+    <title>C9_UZAIR_STRIKE_V6_FINAL</title>
     <style>
         :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --success: #00ff88; --warn: #ffcc00; --err: #ff4757; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
@@ -15,38 +15,56 @@
             transform: translate(-50%, -50%) rotate(90deg); transform-origin: center;
         }
 
-        /* --- NEW LOADING STYLE --- */
-        #global-loader {
+        /* --- LOADING & NEW SCREENS --- */
+        #global-loader, #disclaimer-screen, #credit-screen {
             position: fixed; inset: 0; background: var(--bg); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: none; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center;
         }
-        .spin-char { font-size: 60px; color: var(--accent); animation: rotate 0.8s linear infinite; display: inline-block; font-weight: bold; }
+        .spin-char { font-size: 60px; color: var(--accent); animation: rotate 0.8s linear infinite; display: inline-block; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+        /* Typewriting Animation */
+        .typewriter { overflow: hidden; white-space: nowrap; border-right: 3px solid var(--accent); margin: 0 auto; animation: typing 2.5s steps(40, end), blink-caret .75s step-end infinite; }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
+
+        /* --- V6 ORIGINAL LAYOUT --- */
         #login-screen, #infra-screen, #sqli-screen { position: fixed; inset: 0; display: none; flex-direction: column; padding: 10px; }
         .active { display: flex !important; }
-
         .terminal-box { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px 30px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.6; box-shadow: inset 0 0 20px #000; }
         .side-ctrl { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-        .input-box { background: var(--panel); border: 1px solid var(--border); padding: 10px; }
         input { width: 100%; background: #000; border: 1px solid #333; color: var(--success); padding: 12px; font-size: 15px; outline: none; }
-
         .btn { background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); padding: 18px 5px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; transition: 0.2s; }
         .btn:active { transform: scale(0.95); background: var(--accent); color: #000; }
-        .btn-warn { border-color: var(--warn); color: var(--warn); }
-        .btn-err { border-color: var(--err); color: var(--err); }
-
         .header { font-size: 14px; font-weight: 900; color: #fff; padding: 5px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; margin-bottom: 10px; }
         .footer { font-size: 10px; text-align: center; color: #333; letter-spacing: 4px; margin-top: 5px; font-weight: bold; }
+        .c9-glow { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
 
         @media screen and (orientation: landscape) { body { height: 100vh; width: 100vw; transform: none; top: 0; left: 0; } }
     </style>
 </head>
-<body onload="startApp()">
+<body onload="masterFlow()">
 
     <div id="global-loader">
         <span class="spin-char">)</span>
-        <p id="loader-text" style="margin-top:20px; font-size:10px; color:var(--accent); letter-spacing:3px; font-weight:bold;"></p>
+        <p id="loader-text" style="margin-top:20px; font-size:10px; color:var(--accent); letter-spacing:3px;">INITIALIZING...</p>
+    </div>
+
+    <div id="disclaimer-screen">
+        <h2 style="color:var(--err); margin-bottom:20px; text-decoration:underline;">[!] LEGAL_DISCLAIMER [!]</h2>
+        <div style="width:fit-content; border:1px solid var(--warn); padding:20px;">
+            <p class="typewriter" style="color:var(--warn); font-size:16px;">WARNING: THIS TOOL IS FOR EDUCATIONAL USE ONLY.</p>
+            <p class="typewriter" style="color:var(--warn); font-size:16px; animation-delay: 2.5s;">USE IT AT YOUR OWN RISK. AUTHOR IS NOT RESPONSIBLE.</p>
+        </div>
+    </div>
+
+    <div id="credit-screen">
+        <h1 class="c9-glow" style="font-size:40px; margin-bottom:10px;">C9 UZAIR</h1>
+        <p style="color:#fff; font-size:14px; letter-spacing:2px;">TIKTOK: @c9uzair</p>
+        <div style="margin:30px 0; padding:15px; border:2px dashed var(--err); background:rgba(255, 71, 87, 0.1);">
+            <p style="color:var(--err); font-weight:900; font-size:18px;">THIS IS A FREE TOOL!</p>
+            <p style="color:#fff; font-size:12px;">DO NOT BUY IT FROM ANY ONE</p>
+        </div>
     </div>
 
     <div id="login-screen" style="justify-content:center; align-items:center;">
@@ -62,10 +80,10 @@
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
             <div class="terminal-box" id="infra-log">> Awaiting RDP Tunnel...</div>
             <div class="side-ctrl">
-                <div class="input-box"><label>REMOTE_IP</label><input type="text" id="ip" value="162.251.10.92"></div>
-                <button class="btn" id="b1" onclick="runInfra(1)">PING NODE</button>
-                <button class="btn" id="b2" onclick="runInfra(2)">LINK RSA-4096</button>
-                <button class="btn btn-err" style="margin-top:auto;" onclick="trySwitch()">INJECT SQLi MODULE</button>
+                <input type="text" id="ip" value="162.251.10.92" style="background:#000; border:1px solid #333; color:var(--success); padding:10px; margin-bottom:5px;">
+                <button class="btn" onclick="runInfra(1)">PING NODE</button>
+                <button class="btn" onclick="runInfra(2)">LINK RSA-4096</button>
+                <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="trySwitch()">INJECT SQLi MODULE</button>
             </div>
         </div>
         <div class="footer">MADE BY C9 UZAIR</div>
@@ -74,16 +92,12 @@
     <div id="sqli-screen">
         <div class="header"><span style="color:var(--warn)">[!] MODULE: DATABASE_INJECTION</span><span>STATION: C9_UZAIR_SQLi</span></div>
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
-            <div class="terminal-box" id="sqli-log">
-                <span style="color:var(--warn)">[!] SQLMAP FRAMEWORK INITIALIZED.</span><br>
-                > Target: https://api.internal-db.com/user?id=1
-            </div>
+            <div class="terminal-box" id="sqli-log">> SQLMAP FRAMEWORK INITIALIZED.</div>
             <div class="side-ctrl">
-                <button class="btn btn-warn" id="s1" onclick="sqliAction(1)">[1] TEST VULNERABILITY</button>
-                <button class="btn btn-warn" id="s2" onclick="sqliAction(2)">[2] BYPASS WAF</button>
-                <button class="btn btn-warn" id="s3" onclick="sqliAction(3)">[3] DUMP TABLES</button>
-                <button class="btn btn-err" id="repair-btn" style="display:none;" onclick="repairSystem()">[!] REPAIR DB_ERROR</button>
-                <button class="btn btn-err" style="margin-top:auto;" onclick="location.reload()">TERMINATE</button>
+                <button class="btn" onclick="sqliAction(1)">[1] TEST VULN</button>
+                <button class="btn" onclick="sqliAction(2)">[2] BYPASS WAF</button>
+                <button class="btn" onclick="sqliAction(3)">[3] DUMP TABLES</button>
+                <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="location.reload()">TERMINATE</button>
             </div>
         </div>
         <div class="footer">DESIGNED BY C9 UZAIR // V6.0</div>
@@ -94,19 +108,31 @@
     let isPinged = false;
     const wait = ms => new Promise(r => setTimeout(r, ms));
 
-    // SHOW LOADING HELPER
+    // MAIN APP FLOW
+    async function masterFlow() {
+        // Step 1: Initial Loading
+        await showLoading("SYSTEM BOOTING...", 3000);
+        
+        // Step 2: Disclaimer
+        document.getElementById('disclaimer-screen').style.display = 'flex';
+        await wait(6000); // Wait for typewriting to finish
+        document.getElementById('disclaimer-screen').style.display = 'none';
+
+        // Step 3: Credit Screen
+        document.getElementById('credit-screen').style.display = 'flex';
+        await wait(4000); // Show credits for 4 seconds
+        document.getElementById('credit-screen').style.display = 'none';
+
+        // Step 4: Login Screen
+        document.getElementById('login-screen').classList.add('active');
+    }
+
     async function showLoading(msg, duration) {
         const loader = document.getElementById('global-loader');
         document.getElementById('loader-text').innerText = msg;
         loader.style.display = 'flex';
         await wait(duration);
         loader.style.display = 'none';
-    }
-
-    // STARTUP LOADING
-    async function startApp() {
-        await showLoading("INITIALIZING SYSTEM...", 3000);
-        document.getElementById('login-screen').classList.add('active');
     }
 
     async function login() {
@@ -118,11 +144,10 @@
     }
 
     async function trySwitch() {
-        const log = document.getElementById('infra-log');
         if(!isLinked) {
-            log.innerHTML += `<br><span style="color:var(--err)">[!] ERROR: INFRASTRUCTURE_OFFLINE</span>`;
+            document.getElementById('infra-log').innerHTML += `<br><span style="color:var(--err)">[!] ERROR: LINK RSA FIRST</span>`;
         } else {
-            await showLoading("INJECTING SQLi MODULE...", 2500);
+            await showLoading("INJECTING MODULE...", 2500);
             document.getElementById('infra-screen').classList.remove('active');
             document.getElementById('sqli-screen').classList.add('active');
         }
@@ -131,51 +156,26 @@
     async function runInfra(s) {
         const log = document.getElementById('infra-log');
         if(s===1) {
-            log.innerHTML += `<br>> Pinging ${document.getElementById('ip').value}...`;
-            await wait(1500);
+            log.innerHTML += `<br>> Pinging Node...`;
+            await wait(1000);
             log.innerHTML += `<br><span style="color:var(--success)">> Node Responsive.</span>`;
             isPinged = true;
         } else {
-            if(!isPinged) log.innerHTML += `<br><span style="color:var(--err)">> ERROR: PING_REQUIRED</span>`;
-            else {
-                log.innerHTML += `<br>> Linking RSA...`;
-                await wait(2000);
-                log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] LINK_STABLE.</span>`;
-                isLinked = true;
-                document.getElementById('stat').innerText = "ONLINE";
-                document.getElementById('stat').style.color = "var(--success)";
-            }
+            if(!isPinged) { log.innerHTML += `<br>> Error: Ping First.`; return; }
+            log.innerHTML += `<br>> Linking RSA...`;
+            await wait(1500);
+            log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] LINK_STABLE.</span>`;
+            isLinked = true;
+            document.getElementById('stat').innerText = "ONLINE";
+            document.getElementById('stat').style.color = "var(--success)";
         }
-        log.scrollTop = log.scrollHeight;
     }
 
     async function sqliAction(opt) {
         const log = document.getElementById('sqli-log');
-        if(opt === 1) {
-            log.innerHTML += `<br>> Testing injection points...`;
-            await wait(1500);
-            log.innerHTML += `<br><span style="color:var(--err)">[CRITICAL ERROR] SQL_SYNTAX_BLOCKED_BY_FIREWALL</span>`;
-            log.innerHTML += `<br><span style="color:var(--warn)">> System halted. Manual repair needed.</span>`;
-            document.getElementById('repair-btn').style.display = 'block';
-        } else if(opt === 2) {
-            log.innerHTML += `<br>> Injecting Polyglot Payloads...`;
-            await wait(2000);
-            log.innerHTML += `<br><span style="color:var(--success)">> WAF Bypassed. Connection: Tunneled.</span>`;
-        } else if(opt === 3) {
-            log.innerHTML += `<br>> Dumping 'Users' table...`;
-            await wait(2500);
-            log.innerHTML += `<br><span style="color:var(--success)">> Found: [Admin] | [Pass: hash_c9_uzair]</span>`;
-            log.innerHTML += `<br><span style="color:var(--accent)">> DATABASE_BREACH_COMPLETE.</span>`;
-        }
-        log.scrollTop = log.scrollHeight;
-    }
-
-    async function repairSystem() {
-        const log = document.getElementById('sqli-log');
-        log.innerHTML += `<br><span style="color:var(--accent)">> C9_UZAIR: Re-routing via Hex-Encoder...</span>`;
+        log.innerHTML += `<br>> Processing Option ${opt}...`;
         await wait(2000);
-        log.innerHTML += `<br><span style="color:var(--success)">> System Repaired. Vulnerability unlocked.</span>`;
-        document.getElementById('repair-btn').style.display = 'none';
+        log.innerHTML += `<br><span style="color:var(--success)">> Action Complete.</span>`;
     }
 </script>
 </body>
