@@ -51,10 +51,10 @@
     </div>
 
     <div id="disclaimer-screen">
-        <h2 style="color:var(--err); margin-bottom:20px; text-decoration:underline;">[!] LEGAL_DISCLAIMER [!]</h2>
+        <h2 style="color:var(--err); margin-bottom:20px; text-decoration:underline;">[!] DISCLAIMER [!]</h2>
         <div style="width:fit-content; border:1px solid var(--warn); padding:20px;">
             <p class="typewriter" style="color:var(--warn); font-size:16px;">WARNING: THIS TOOL IS FOR EDUCATIONAL USE ONLY.</p>
-            <p class="typewriter" style="color:var(--warn); font-size:16px; animation-delay: 2.5s;">USE IT AT YOUR OWN RISK. AUTHOR IS NOT RESPONSIBLE.</p>
+            <p class="typewriter" style="color:var(--warn); font-size:16px; animation-delay: 2.5s;">USE IT AT YOUR OWN RISK. C9 UZAIR IS NOT RESPONSIBLE.</p>
         </div>
     </div>
 
@@ -62,14 +62,14 @@
         <h1 class="c9-glow" style="font-size:40px; margin-bottom:10px;">C9 UZAIR</h1>
         <p style="color:#fff; font-size:14px; letter-spacing:2px;">TIKTOK: @c9uzair</p>
         <div style="margin:30px 0; padding:15px; border:2px dashed var(--err); background:rgba(255, 71, 87, 0.1);">
-            <p style="color:var(--err); font-weight:900; font-size:18px;">THIS IS A FREE TOOL!</p>
+            <p style="color:var(--err); font-weight:900; font-size:18px;">THIS IS A FREE TOOL! MADE BY C9 UZAIR</p>
             <p style="color:#fff; font-size:12px;">DO NOT BUY IT FROM ANY ONE</p>
         </div>
     </div>
 
     <div id="login-screen" style="justify-content:center; align-items:center;">
         <div style="width:400px; padding:30px; border:2px solid var(--accent); background:var(--panel); text-align:center;">
-            <h1 style="color:#fff;">C9_UZAIR_STRIKE</h1>
+            <h1 style="color:#fff;">C9_UZAIR_WIFI</h1>
             <input type="password" id="passkey" placeholder="SECURE ACCESS KEY" style="text-align:center; margin:20px 0;">
             <button class="btn" style="width:100%" onclick="login()">BOOT CORE</button>
         </div>
@@ -80,7 +80,7 @@
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
             <div class="terminal-box" id="infra-log">> Awaiting RDP Tunnel...</div>
             <div class="side-ctrl">
-                <input type="text" id="ip" value="162.251.10.92" style="background:#000; border:1px solid #333; color:var(--success); padding:10px; margin-bottom:5px;">
+                <input type="text" id="ip" value="Enter Remote IP" style="background:#000; border:1px solid #333; color:var(--success); padding:10px; margin-bottom:5px;">
                 <button class="btn" onclick="runInfra(1)">PING NODE</button>
                 <button class="btn" onclick="runInfra(2)">LINK RSA-4096</button>
                 <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="trySwitch()">INJECT SQLi MODULE</button>
@@ -100,7 +100,7 @@
                 <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="location.reload()">TERMINATE</button>
             </div>
         </div>
-        <div class="footer">DESIGNED BY C9 UZAIR // V6.0</div>
+        <div class="footer">MADE BY C9 UZAIR // V6.0</div>
     </div>
 
 <script>
@@ -115,12 +115,12 @@
         
         // Step 2: Disclaimer
         document.getElementById('disclaimer-screen').style.display = 'flex';
-        await wait(6000); // Wait for typewriting to finish
+        await wait(12000); // Wait for typewriting to finish
         document.getElementById('disclaimer-screen').style.display = 'none';
 
         // Step 3: Credit Screen
         document.getElementById('credit-screen').style.display = 'flex';
-        await wait(4000); // Show credits for 4 seconds
+        await wait(10000); // Show credits for 4 seconds
         document.getElementById('credit-screen').style.display = 'none';
 
         // Step 4: Login Screen
@@ -136,7 +136,7 @@
     }
 
     async function login() {
-        if(document.getElementById('passkey').value === "C9") {
+        if(document.getElementById('passkey').value === "c9uzair_free_hack") {
             await showLoading("AUTHORIZING...", 2500);
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('infra-screen').classList.add('active');
@@ -173,9 +173,9 @@
 
     async function sqliAction(opt) {
         const log = document.getElementById('sqli-log');
-        log.innerHTML += `<br>> Processing Option ${opt}...`;
+        log.innerHTML += `<br>> Please Wait.. ${opt}...`;
         await wait(2000);
-        log.innerHTML += `<br><span style="color:var(--success)">> Action Complete.</span>`;
+        log.innerHTML += `<br><span style="color:var(--success)">> Name : ABC : Pass : ahilabbas.</span>`;
     }
 </script>
 </body>
