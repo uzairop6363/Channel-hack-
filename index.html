@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>C9_UZAIR_STRIKE_V6</title>
+    <title>C9_UZAIR_ULTIMATE_V7</title>
     <style>
         :root { --accent: #00d4ff; --bg: #050608; --panel: #0f1218; --text: #8a929e; --border: #1a1e23; --success: #00ff88; --warn: #ffcc00; --err: #ff4757; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Consolas', monospace; }
@@ -15,22 +15,37 @@
             transform: translate(-50%, -50%) rotate(90deg); transform-origin: center;
         }
 
-        #login-screen, #infra-screen, #sqli-screen { position: fixed; inset: 0; display: none; flex-direction: column; padding: 10px; }
+        #login-screen, #infra-screen, #attack-screen { position: fixed; inset: 0; display: none; flex-direction: column; padding: 10px; }
         .active { display: flex !important; }
 
-        .terminal-box { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px 30px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.6; box-shadow: inset 0 0 20px #000; }
-        .side-ctrl { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-        .input-box { background: var(--panel); border: 1px solid var(--border); padding: 10px; }
-        input { width: 100%; background: #000; border: 1px solid #333; color: var(--success); padding: 12px; font-size: 15px; outline: none; }
+        /* --- UI COMPONENTS --- */
+        .terminal-box { flex: 1.2; background: #000; border: 1px solid var(--border); padding: 20px; font-size: 15px; color: #fff; overflow-y: auto; line-height: 1.6; box-shadow: inset 0 0 15px #000; }
+        .side-ctrl { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 20px; }
+        
+        /* --- WIFI LIST STYLING --- */
+        .wifi-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .wifi-item { 
+            background: #0a0c10; border: 1px solid #222; padding: 12px; cursor: pointer; 
+            font-size: 13px; color: var(--accent); transition: 0.2s;
+        }
+        .wifi-item:hover { border-color: var(--accent); background: rgba(0, 212, 255, 0.1); }
+        .wifi-selected { border-color: var(--success) !important; color: var(--success) !important; background: rgba(0, 255, 136, 0.1) !important; font-weight: bold; }
 
-        .btn { background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); padding: 18px 5px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; transition: 0.2s; }
+        /* --- BUTTONS & ANIMATIONS --- */
+        .btn { 
+            background: rgba(0, 212, 255, 0.05); border: 2px solid var(--accent); color: var(--accent); 
+            padding: 16px 5px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 900; 
+            transition: 0.3s; letter-spacing: 1px; position: relative;
+        }
         .btn:active { transform: scale(0.95); background: var(--accent); color: #000; }
-        .btn-warn { border-color: var(--warn); color: var(--warn); }
-        .btn-err { border-color: var(--err); color: var(--err); }
-        .loading { opacity: 0.5; pointer-events: none; border-style: dashed; }
-
-        .header { font-size: 14px; font-weight: 900; color: #fff; padding: 5px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .footer { font-size: 10px; text-align: center; color: #333; letter-spacing: 4px; margin-top: 5px; font-weight: bold; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #333; color: #555; }
+        
+        .loading-bar { height: 3px; background: var(--accent); width: 0%; transition: width 0.5s; position: absolute; bottom: 0; left: 0; }
+        
+        /* --- BRANDING --- */
+        .c9-focus { color: var(--accent); text-shadow: 0 0 10px var(--accent); font-weight: 900; }
+        .header { font-size: 14px; padding: 8px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .footer { font-size: 10px; text-align: center; padding: 5px; color: #444; letter-spacing: 5px; font-weight: bold; }
 
         @media screen and (orientation: landscape) { body { height: 100vh; width: 100vw; transform: none; top: 0; left: 0; } }
     </style>
@@ -38,115 +53,134 @@
 <body>
 
     <div id="login-screen" class="active" style="justify-content:center; align-items:center;">
-        <div style="width:400px; padding:30px; border:2px solid var(--accent); background:var(--panel); text-align:center;">
-            <h1 style="color:#fff;">C9_UZAIR_STRIKE</h1>
-            <input type="password" id="passkey" placeholder="SECURE ACCESS KEY" style="text-align:center; margin:20px 0;">
-            <button class="btn" style="width:100%" onclick="login()">BOOT CORE</button>
+        <div style="width:420px; padding:40px; border:2px solid var(--accent); background:var(--panel); text-align:center;">
+            <h1 class="c9-focus">C9_UZAIR_STRIKE</h1>
+            <p style="font-size:9px; letter-spacing:3px; margin-bottom:20px;">AUTHORIZATION REQUIRED</p>
+            <input type="password" id="passkey" placeholder="••••••••" style="width:100%; background:#000; border:1px solid #333; color:var(--success); padding:15px; text-align:center; font-size:18px; margin-bottom:20px; outline:none;">
+            <button class="btn" style="width:100%" onclick="login()">INITIALIZE ACCESS</button>
+            <p style="margin-top:20px; font-size:10px;">MADE BY <span class="c9-focus">C9 UZAIR</span></p>
         </div>
     </div>
 
     <div id="infra-screen">
-        <div class="header"><span>SYSTEM_UPLINK // <span id="stat" style="color:var(--err)">OFFLINE</span></span><span>DEV: C9 UZAIR</span></div>
+        <div class="header">
+            <span>UPLINK_INFRA // <span id="stat" style="color:var(--err)">OFFLINE</span></span>
+            <span class="c9-focus">ADMIN: C9 UZAIR</span>
+        </div>
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
-            <div class="terminal-box" id="infra-log">> Awaiting RDP Tunnel...</div>
+            <div class="terminal-box" id="infra-log">> Awaiting RDP node configuration...</div>
             <div class="side-ctrl">
-                <div class="input-box"><label>REMOTE_IP</label><input type="text" id="ip" value="162.251.10.92"></div>
-                <button class="btn" id="b1" onclick="runInfra(1)">PING NODE</button>
-                <button class="btn" id="b2" onclick="runInfra(2)">LINK RSA-4096</button>
-                <button class="btn btn-err" style="margin-top:auto;" onclick="trySwitch()">INJECT SQLi MODULE</button>
+                <div style="background:var(--panel); border:1px solid var(--border); padding:10px;">
+                    <label style="font-size:10px; color:var(--accent);">SERVER_UPLINK_IP</label>
+                    <input type="text" id="ip" value="162.251.10.92" style="width:100%; background:transparent; border:none; color:#fff; font-size:16px;">
+                </div>
+                <button class="btn" id="p-btn" onclick="runInfra(1)">PING SERVER<div class="loading-bar" id="pb1"></div></button>
+                <button class="btn" id="r-btn" onclick="runInfra(2)">STABLISH RSA LINK<div class="loading-bar" id="pb2"></div></button>
+                <button class="btn" id="launch-btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="trySwitch()">LAUNCH ATTACK MODULE</button>
             </div>
         </div>
         <div class="footer">MADE BY C9 UZAIR</div>
     </div>
 
-    <div id="sqli-screen">
-        <div class="header"><span style="color:var(--warn)">[!] MODULE: DATABASE_INJECTION</span><span>STATION: C9_UZAIR_SQLi</span></div>
+    <div id="attack-screen">
+        <div class="header">
+            <span style="color:var(--warn)">[!] ATTACK_STATION_ACTIVE</span>
+            <span class="c9-focus">MADE BY C9 UZAIR</span>
+        </div>
         <div style="display:flex; height:100%; gap:10px; overflow:hidden;">
-            <div class="terminal-box" id="sqli-log">
-                <span style="color:var(--warn)">[!] SQLMAP FRAMEWORK INITIALIZED.</span><br>
-                > Target: https://api.internal-db.com/user?id=1
+            <div class="terminal-box" id="atk-log">
+                <span style="color:var(--success)">[+] STRIKE_MODULE_LOADED.</span><br>
+                > Manual target selection required.
+                <div class="wifi-list" id="wifi-display" style="display:none;">
+                    </div>
             </div>
             <div class="side-ctrl">
-                <button class="btn btn-warn" id="s1" onclick="sqliAction(1)">[1] TEST VULNERABILITY</button>
-                <button class="btn btn-warn" id="s2" onclick="sqliAction(2)">[2] BYPASS WAF</button>
-                <button class="btn btn-warn" id="s3" onclick="sqliAction(3)">[3] DUMP TABLES</button>
-                <button class="btn btn-err" id="repair-btn" style="display:none;" onclick="repairSystem()">[!] REPAIR DB_ERROR</button>
-                <button class="btn btn-err" style="margin-top:auto;" onclick="location.reload()">TERMINATE</button>
+                <button class="btn" onclick="scanWifi()">[1] SCAN TARGETS</button>
+                <button class="btn" id="exploit-btn" disabled onclick="runExploit()">[2] INJECT PAYLOAD</button>
+                <button class="btn" id="dump-btn" disabled onclick="dumpData()">[3] DUMP DATABASE</button>
+                <button class="btn" style="margin-top:auto; border-color:var(--err); color:var(--err);" onclick="location.reload()">ABORT MISSION</button>
             </div>
         </div>
-        <div class="footer">DESIGNED BY C9 UZAIR // V6.0</div>
+        <div class="footer">C9 UZAIR // V7.0 FINAL</div>
     </div>
 
 <script>
     let isLinked = false;
-    let isPinged = false;
+    let selectedTarget = null;
     const wait = ms => new Promise(r => setTimeout(r, ms));
 
     function login() {
         if(document.getElementById('passkey').value === "C9") {
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('infra-screen').classList.add('active');
-        } else { alert("DENIED."); }
+        } else { alert("ACCESS DENIED!"); }
     }
 
     async function runInfra(s) {
         const log = document.getElementById('infra-log');
-        if(s===1) {
-            log.innerHTML += `<br>> Pinging ${document.getElementById('ip').value}...`;
-            await wait(1500);
-            log.innerHTML += `<br><span style="color:var(--success)">> Node Responsive.</span>`;
-            isPinged = true;
+        const bar = document.getElementById(`pb${s}`);
+        bar.style.width = "100%";
+        
+        if(s === 1) {
+            log.innerHTML += `<br>> Pinging node ${document.getElementById('ip').value}...`;
+            await wait(2000);
+            log.innerHTML += `<br><span style="color:var(--success)">> [REPLY] 162.251.10.92: time=12ms TTL=54</span>`;
         } else {
-            if(!isPinged) log.innerHTML += `<br><span style="color:var(--err)">> ERROR: PING_REQUIRED</span>`;
-            else {
-                log.innerHTML += `<br>> Linking RSA...`;
-                await wait(2000);
-                log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] LINK_STABLE.</span>`;
-                isLinked = true;
-                document.getElementById('stat').innerText = "ONLINE";
-                document.getElementById('stat').style.color = "var(--success)";
-            }
+            log.innerHTML += `<br>> Negotiating RSA-4096 / AES-256...`;
+            await wait(3000);
+            log.innerHTML += `<br><span style="color:var(--accent)">> [SUCCESS] Secure Tunnel Established.</span>`;
+            isLinked = true;
+            document.getElementById('stat').innerText = "ONLINE";
+            document.getElementById('stat').style.color = "var(--success)";
         }
-        log.scrollTop = log.scrollHeight;
     }
 
     function trySwitch() {
-        const log = document.getElementById('infra-log');
         if(!isLinked) {
-            log.innerHTML += `<br><span style="color:var(--err)">[!] ERROR: INFRASTRUCTURE_OFFLINE</span>`;
+            document.getElementById('infra-log').innerHTML += `<br><span style="color:var(--err)">[!] ERROR: UPLINK_REQUIRED</span>`;
         } else {
             document.getElementById('infra-screen').classList.remove('active');
-            document.getElementById('sqli-screen').classList.add('active');
+            document.getElementById('attack-screen').classList.add('active');
         }
     }
 
-    async function sqliAction(opt) {
-        const log = document.getElementById('sqli-log');
-        if(opt === 1) {
-            log.innerHTML += `<br>> Testing injection points...`;
-            await wait(1500);
-            log.innerHTML += `<br><span style="color:var(--err)">[CRITICAL ERROR] SQL_SYNTAX_BLOCKED_BY_FIREWALL</span>`;
-            log.innerHTML += `<br><span style="color:var(--warn)">> System halted. Manual repair needed.</span>`;
-            document.getElementById('repair-btn').style.display = 'block';
-        } else if(opt === 2) {
-            log.innerHTML += `<br>> Injecting Polyglot Payloads...`;
-            await wait(2000);
-            log.innerHTML += `<br><span style="color:var(--success)">> WAF Bypassed. Connection: Tunneled.</span>`;
-        } else if(opt === 3) {
-            log.innerHTML += `<br>> Dumping 'Users' table...`;
-            await wait(2500);
-            log.innerHTML += `<br><span style="color:var(--success)">> Found: [Admin] | [Pass: hash_c9_uzair]</span>`;
-            log.innerHTML += `<br><span style="color:var(--accent)">> DATABASE_BREACH_COMPLETE.</span>`;
-        }
+    async function scanWifi() {
+        const log = document.getElementById('atk-log');
+        const display = document.getElementById('wifi-display');
+        log.innerHTML += `<br><span style="color:var(--warn)">> Scanning nearby airwaves for vulnerabilities...</span>`;
+        await wait(2500);
+        
+        display.style.display = 'flex';
+        display.innerHTML = `
+            <div class="wifi-item" onclick="selectWifi(this, 'PTCL-92')">PTCL-BB-92 [PWR: -42dBm]</div>
+            <div class="wifi-item" onclick="selectWifi(this, 'C9_SECURE_WIFI')">C9_SECURE_WIFI [PWR: -22dBm]</div>
+            <div class="wifi-item" onclick="selectWifi(this, 'TP-LINK_EXT')">TP-LINK_EXT [PWR: -65dBm]</div>
+        `;
+    }
+
+    function selectWifi(el, name) {
+        document.querySelectorAll('.wifi-item').forEach(i => i.classList.remove('wifi-selected'));
+        el.classList.add('wifi-selected');
+        selectedTarget = name;
+        document.getElementById('atk-log').innerHTML += `<br><span style="color:var(--success)">> Target Selected: [${name}]</span>`;
+        document.getElementById('exploit-btn').disabled = false;
+    }
+
+    async function runExploit() {
+        const log = document.getElementById('atk-log');
+        log.innerHTML += `<br>> Injecting SQLi Polyglot into ${selectedTarget}...`;
+        await wait(3000);
+        log.innerHTML += `<br><span style="color:var(--success)">> [SUCCESS] WAF Bypassed. Remote SQL Access Granted.</span>`;
+        document.getElementById('dump-btn').disabled = false;
+    }
+
+    async function dumpData() {
+        const log = document.getElementById('atk-log');
+        log.innerHTML += `<br><span style="color:var(--accent)">> Dumping 'admin_accounts' from ${selectedTarget}...</span>`;
+        await wait(3500);
+        log.innerHTML += `<br><span style="color:var(--success)">> FOUND: [ADMIN] | [PASS: hash_C9_UZAIR_99]</span>`;
+        log.innerHTML += `<br><br><span class="c9-focus">MISSION ACCOMPLISHED BY C9 UZAIR.</span>`;
         log.scrollTop = log.scrollHeight;
-    }
-
-    async function repairSystem() {
-        const log = document.getElementById('sqli-log');
-        log.innerHTML += `<br><span style="color:var(--accent)">> C9_UZAIR: Re-routing via Hex-Encoder...</span>`;
-        await wait(2000);
-        log.innerHTML += `<br><span style="color:var(--success)">> System Repaired. Vulnerability unlocked.</span>`;
-        document.getElementById('repair-btn').style.display = 'none';
     }
 </script>
 </body>
