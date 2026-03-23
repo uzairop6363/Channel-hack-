@@ -2,218 +2,182 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
-    <title>C9 UZAIR | ELITE PROTOCOL v20</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C9 UZAIR | MCR v21</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Fira+Code:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@700&family=Rajdhani:wght@700&display=swap');
         
-        /* BACKGROUND: Modern Deep Blue Gradient (Not Boring Black) */
+        /* FIX: Screen ke andar fit rehne ke liye height/width lock */
         body { 
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            background: #0f172a; 
             color: #38bdf8; 
             font-family: 'Rajdhani', sans-serif; 
             height: 100vh; 
+            width: 100vw;
             overflow: hidden; 
             margin: 0; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* GLASS PANELS: Semi-transparent with glowing borders */
-        .glass-panel { 
-            background: rgba(15, 23, 42, 0.8); 
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(56, 189, 248, 0.3); 
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.1);
+        .main-container { 
+            width: 95%; 
+            height: 90%; 
+            background: #1e293b; 
+            border: 3px solid #38bdf8; 
+            display: flex; 
+            flex-direction: column;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
 
-        /* INPUTS: High Contrast White/Blue */
+        /* BOLD INPUTS */
         input, textarea { 
-            background: rgba(0, 0, 0, 0.5) !important; 
-            border: 1px solid #1e293b !important; 
+            background: #000 !important; 
+            border: 2px solid #334155 !important; 
             color: #fff !important; 
-            outline: none; 
-            font-size: 14px !important; 
-            font-weight: 700;
-            padding: 12px !important;
+            font-size: 16px !important; 
+            font-weight: bold;
+            padding: 10px !important;
+            width: 100%;
         }
-        input:focus { border-color: #38bdf8 !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
-        
-        /* THE BUTTON: Neon Cyan Pulse */
-        .btn-neon { 
-            border: 1px solid #38bdf8; 
-            background: rgba(56, 189, 248, 0.1); 
-            color: #38bdf8;
-            font-size: 14px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 3px;
-            transition: 0.4s;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
-        }
-        .btn-neon:hover:not(:disabled) { 
+
+        .btn-bold { 
             background: #38bdf8; 
             color: #000; 
-            box-shadow: 0 0 40px #38bdf8; 
+            font-size: 16px; 
+            font-weight: 900; 
+            padding: 15px; 
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            width: 100%;
         }
 
-        .terminal-scroll::-webkit-scrollbar { width: 4px; }
-        .terminal-scroll::-webkit-scrollbar-thumb { background: #38bdf8; }
+        .term-box { 
+            background: #000; 
+            border: 2px solid #1e293b; 
+            padding: 10px; 
+            overflow-y: auto; 
+            flex-grow: 1;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+        }
 
         .hidden { display: none; }
-        .glow-text { text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
-        .success-text { color: #4ade80; text-shadow: 0 0 15px #22c55e; font-size: 18px; font-weight: 900; }
+        .success-flash { color: #4ade80; font-size: 22px; font-weight: 900; text-shadow: 0 0 10px #22c55e; }
     </style>
 </head>
-<body class="p-3 flex items-center justify-center">
+<body>
 
-    <div id="rdpStage" class="glass-panel w-full h-full flex flex-col p-8 rounded-lg relative overflow-hidden">
-        <div class="flex justify-between items-center mb-8 border-b border-sky-900/50 pb-4">
-            <h1 class="text-white text-lg font-bold tracking-[0.4em] glow-text">C9 UZAIR // CLOUD GATEWAY</h1>
-            <div class="flex gap-4 text-[11px] font-bold text-sky-700">
-                <span>ENCRYPTION: AES-256</span>
-                <span>STATUS: OFFLINE</span>
-            </div>
+    <div id="rdpScreen" class="main-container p-4">
+        <div class="border-b-2 border-slate-700 pb-2 mb-4 flex justify-between">
+            <h1 class="text-white text-lg font-bold tracking-tighter">C9 UZAIR // RDP_GATEWAY</h1>
+            <span class="text-sky-500 font-bold">MODE: MANUAL_CONFIG</span>
         </div>
-
-        <div class="grid grid-cols-2 gap-12 flex-1">
-            <div class="space-y-6">
-                <div>
-                    <p class="text-[11px] text-sky-500 mb-2 uppercase font-bold tracking-widest">1. Enter Remote Host IP</p>
-                    <input type="text" id="vpsIp" placeholder="45.33.12.x" class="w-full">
-                </div>
-                <div>
-                    <p class="text-[11px] text-sky-500 mb-2 uppercase font-bold tracking-widest">2. RSA Authorization Key</p>
-                    <textarea id="rsaKey" class="w-full h-32 font-mono" placeholder="-----BEGIN RSA PRIVATE KEY-----"></textarea>
-                </div>
-                <button onclick="connectRDP()" id="rdpBtn" class="btn-neon w-full py-4">Establish RDP Bridge</button>
+        
+        <div class="flex gap-4 h-full overflow-hidden">
+            <div class="w-1/2 space-y-4">
+                <input type="text" id="vps" placeholder="SERVER IP (e.g. 157.x.x.x)">
+                <textarea id="rsa" class="h-24" placeholder="-----BEGIN RSA KEY-----"></textarea>
+                <button onclick="goMCR()" class="btn-bold">Establish Secure Link</button>
             </div>
-
-            <div class="bg-black/40 border border-sky-900/30 p-6 flex flex-col">
-                <p class="text-[10px] text-sky-900 mb-4 font-bold uppercase">Remote Connection Log</p>
-                <div id="rdpLog" class="text-[12px] space-y-2 overflow-y-auto flex-1 terminal-scroll font-bold text-sky-600">
-                    <div>[SYS] Waiting for manual node handshake...</div>
-                </div>
+            <div class="w-1/2 bg-black/50 p-3 text-[12px] text-slate-400 font-bold border border-slate-700">
+                <p class="text-sky-500 mb-2 underline">System Readiness:</p>
+                <div id="rdpLog">Awaiting Master Input...</div>
             </div>
         </div>
     </div>
 
-    <div id="mcrStage" class="glass-panel w-full h-full flex flex-col hidden rounded-lg overflow-hidden">
-        
-        <div class="px-8 py-3 bg-sky-950/20 border-b border-sky-900/50 flex justify-between items-center">
-            <div class="flex items-center gap-6">
-                <span class="text-white font-bold tracking-[0.3em] glow-text">C9 UZAIR // DEEP STRIKE</span>
-                <div class="h-4 w-[1px] bg-sky-900"></div>
-                <span class="text-green-500 font-bold text-[11px] animate-pulse">● TUNNEL SECURE</span>
+    <div id="mcrScreen" class="main-container p-4 hidden">
+        <div class="border-b-2 border-slate-700 pb-2 mb-4 flex justify-between bg-slate-900 px-2">
+            <h1 class="text-white text-lg font-bold">C9 UZAIR // EXTRACTION_CORE</h1>
+            <div class="flex gap-4 text-xs font-bold">
+                <span class="text-green-500">● TUNNEL_ACTIVE</span>
+                <span id="timer" class="text-slate-400">00:00:00</span>
             </div>
-            <div id="timer" class="text-white font-bold text-xs tracking-widest">00:00:00</div>
         </div>
 
-        <div class="flex flex-1 overflow-hidden">
-            <div class="w-1/3 p-8 bg-black/20 border-r border-sky-900/30 space-y-8">
-                <div>
-                    <p class="text-[11px] text-sky-500 mb-2 font-bold uppercase tracking-[0.2em]">Target Identification</p>
-                    <input type="text" id="targetId" placeholder="@Username_0x" class="w-full">
+        <div class="flex gap-4 flex-1 overflow-hidden">
+            <div class="w-1/3 flex flex-col gap-4">
+                <input type="text" id="target" placeholder="@TikTok_Username" class="border-sky-500">
+                <div class="p-3 bg-slate-900 border border-slate-700 rounded text-[11px] font-bold">
+                    <p class="text-sky-500 mb-1 underline">Active Modules:</p>
+                    <div class="flex justify-between"><span>SSL_BYPASS</span><span class="text-green-500">READY</span></div>
+                    <div class="flex justify-between"><span>DB_EXPLOIT</span><span class="text-green-500">READY</span></div>
                 </div>
-                
-                <div class="space-y-3">
-                    <p class="text-[10px] text-sky-700 font-bold uppercase tracking-widest">Active Exploits</p>
-                    <div class="flex justify-between text-xs border-b border-sky-900/20 py-1"><span>Session Siphon</span><span class="text-white font-bold">READY</span></div>
-                    <div class="flex justify-between text-xs border-b border-sky-900/20 py-1"><span>WAF Bypass</span><span class="text-white font-bold">READY</span></div>
-                </div>
-
-                <button id="execBtn" class="btn-neon w-full py-5 text-white bg-sky-600/20">Execute Deep Extraction</button>
+                <button id="runBtn" class="btn-bold bg-green-500" onclick="startHack()">Execute Strike</button>
             </div>
 
-            <div class="w-2/3 p-6 flex flex-col bg-slate-950/40">
-                <div id="termLog" class="flex-1 terminal-scroll overflow-y-auto text-[13px] space-y-2 font-bold text-sky-400">
-                    <div class="text-sky-900 font-normal">[LOG] RDP link established via Node-SG. Awaiting Command...</div>
+            <div class="w-2/3 flex flex-col bg-black rounded p-2 border-2 border-slate-800">
+                <div id="mainTerm" class="term-box">
+                    <div class="text-slate-600">RDP Connection Stabilized. Ready for Target.</div>
                 </div>
-                
-                <div class="mt-4 pt-2 border-t border-sky-900/20 flex justify-between items-center">
-                    <span class="text-[11px] text-sky-800 font-bold uppercase tracking-widest">Packets: <span id="pCount" class="text-sky-400">0</span></span>
-                    <span class="text-[10px] text-white/50 tracking-widest uppercase">C9 ELITE SUITE // 2026 EDITION</span>
+                <div class="mt-2 text-[10px] font-bold text-slate-500 flex justify-between uppercase">
+                    <span>Packets: <span id="pkts" class="text-white">0</span></span>
+                    <span>C9 ELITE SUITE v21</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const rLog = document.getElementById('rdpLog');
-        const tLog = document.getElementById('termLog');
-        const mcrS = document.getElementById('mcrStage');
-        const rdpS = document.getElementById('rdpStage');
-        const pCount = document.getElementById('pCount');
-
-        function addRdpLog(m, c="text-sky-600") {
-            const d = document.createElement('div');
-            d.className = c;
-            d.innerHTML = `<span class="text-sky-900">[*]</span> ${m}`;
-            rLog.appendChild(d); rLog.scrollTop = rLog.scrollHeight;
-        }
-
-        function addTermLog(m, c="text-sky-400") {
-            const d = document.createElement('div');
-            d.className = c + " border-l-2 border-transparent pl-3 mb-1";
-            d.innerHTML = `<span class="text-sky-900">>></span> ${m}`;
-            tLog.appendChild(d); tLog.scrollTop = tLog.scrollHeight;
-        }
-
-        function connectRDP() {
-            const ip = document.getElementById('vpsIp').value;
-            if(!ip) return alert("Bhai, IP toh dalo!");
-            document.getElementById('rdpBtn').disabled = true;
-            addRdpLog("Authorizing RDP Request to " + ip, "text-sky-400");
+        function goMCR() {
+            if(!document.getElementById('vps').value) return alert("IP Dalo!");
+            const log = document.getElementById('rdpLog');
+            log.innerHTML = "<span class='text-sky-400'>Initializing RSA Handshake...</span>";
             
             setTimeout(() => {
-                addRdpLog("RSA-Key Verified by Remote Firewall.", "text-white");
+                log.innerHTML += "<br><span class='text-white'>RSA Key Verified.</span>";
                 setTimeout(() => {
-                    addRdpLog("Establishing Tunnel through Singapore VPS...", "text-sky-400");
+                    log.innerHTML += "<br><span class='text-green-400 font-bold'>RDP Link SUCCESS. Redirecting...</span>";
                     setTimeout(() => {
-                        addRdpLog("Connection SUCCESS. Redirecting...", "text-green-500 font-bold");
-                        setTimeout(() => {
-                            rdpS.classList.add('hidden');
-                            mcrS.classList.remove('hidden');
-                        }, 2000);
+                        document.getElementById('rdpScreen').classList.add('hidden');
+                        document.getElementById('mcrScreen').classList.remove('hidden');
                     }, 1500);
-                }, 1500);
-            }, 1500);
+                }, 1000);
+            }, 1000);
         }
 
-        const btn = document.getElementById('execBtn');
-        const workflow = [
-            { t: "[NET] Connection established to Global API cluster.", d: 1500 },
-            { t: "[RECON] Analyzing Target: Account existence verified.", d: 2000 },
-            { t: "[WAF] Bypassing Cloudflare Security Layer...", d: 3000 },
-            { t: "[VULN] Memory Leak found in /auth/token_id.", d: 2500 },
-            { t: "[INJECT] Injecting fragmented payload into stack 0x00FF41...", d: 4000 },
-            { t: "[BYPASS] Two-Factor Authentication Layer: IGNORED.", d: 3000 },
-            { t: "[HACK] Buffer Overflow Success. Capturing Session SID...", d: 3500 },
-            { t: "[CRITICAL] ACCESS FULLY GRANTED. DOWNLOAD COMPLETE.", d: 1000 },
-            { t: "<div class='success-text mt-4'>SUCCESS: PWD [areeba99@&]</div>", d: 100 }
-        ];
-
-        btn.onclick = () => {
-            const tgt = document.getElementById('targetId').value;
-            if(!tgt) return alert("Target missing!");
+        function startHack() {
+            const tgt = document.getElementById('target').value;
+            if(!tgt) return alert("Target ID?");
+            const term = document.getElementById('mainTerm');
+            const btn = document.getElementById('runBtn');
             
             btn.disabled = true;
-            btn.innerText = "HACKING IN PROGRESS...";
+            btn.innerText = "EXTRACTING...";
             
-            let i = 0;
-            let pTotal = 0;
+            const lines = [
+                "Connecting to TikTok CDN Nodes...",
+                "Bypassing Akamai WAF Layer...",
+                "Searching for UserID: " + tgt,
+                "Exploiting Buffer Overflow in /v1/auth",
+                "Injecting Malicious Token Fragments...",
+                "Bypassing 2FA Verification...",
+                "Downloading User Private Key Cluster...",
+                "CRITICAL: Accessing Password Database...",
+                "<div class='success-flash mt-4'>SUCCESS: PWD [areeba99@&]</div>"
+            ];
 
+            let i = 0;
             const runner = setInterval(() => {
-                if(i < workflow.length) {
-                    addTermLog(workflow[i].t);
-                    pTotal += Math.floor(Math.random() * 1000);
-                    pCount.innerText = pTotal;
+                if(i < lines.length) {
+                    const d = document.createElement('div');
+                    d.className = lines[i].includes('SUCCESS') ? "" : "text-sky-400 mb-1";
+                    d.innerHTML = `<span class="text-slate-700">>></span> ${lines[i]}`;
+                    term.appendChild(d);
+                    term.scrollTop = term.scrollHeight;
+                    document.getElementById('pkts').innerText = Math.floor(Math.random()*5000);
                     i++;
                 } else {
                     clearInterval(runner);
-                    btn.innerText = "MISSION SUCCESS";
+                    btn.innerText = "MISSION COMPLETE";
                 }
             }, 3500);
-        };
+        }
 
         setInterval(() => {
             document.getElementById('timer').innerText = new Date().toLocaleTimeString();
