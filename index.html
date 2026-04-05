@@ -1,141 +1,208 @@
-<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>bit - C9 UZAIR Deep Load</title><script src="https://cdn.tailwindcss.com"></script><style>
-    body { background-color: #f7f9fc; font-family: -apple-system, system-ui, sans-serif; margin: 0; overflow: hidden; user-select: none; }
-    
-    /* App Sections - Initial Hidden (Achanak load style) */
-    .app-part { display: none; }
-    .show-part { display: block !important; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root { --navy: #002366; --f-blue: #1a73e8; --bg: #f4f7f9; --white: #ffffff; --border: #e1e4e8; --danger: #d32f2f; --success: #2e7d32; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        
+        /* ERROR NOTIFICATION */
+        #error-msg { background: var(--danger); color: white; padding: 12px 20px; border-radius: 8px; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 30000; display: none; font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-    .app-viewport { width: 100%; max-width: 500px; margin: 0 auto; min-height: 100vh; background: #f7f9fc; position: relative; }
-    
-    /* UI Styling */
-    .balance-box { padding: 70px 20px 40px; text-align: center; }
-    .balance-amount { font-size: 85px; font-weight: 400; color: #1c1c1e; line-height: 1; }
-    .currency-symbol { font-size: 35px; vertical-align: middle; margin-left: 8px; }
+        /* ACCESS KEY POPUP */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 20000; backdrop-filter: blur(8px); padding: 20px; }
+        .modal-card { background: var(--white); width: 100%; max-width: 350px; border-radius: 20px; overflow: hidden; animation: popIn 0.3s ease; border: 1px solid var(--border); position: relative; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { background: var(--navy); color: white; padding: 25px; text-align: center; }
+        .close-x { position: absolute; right: 15px; top: 15px; color: white; cursor: pointer; font-size: 22px; opacity: 0.8; }
 
-    .actions-grid { display: flex; justify-content: center; gap: 35px; margin-bottom: 40px; }
-    .action-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.06); font-size: 28px; color: white; }
-    
-    .activity-card { background: white; border-radius: 28px; margin: 0 15px; padding: 25px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); min-height: 280px; }
-    .trans-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        /* LOADING SCREEN */
+        #splash { position: fixed; inset: 0; background: var(--navy); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; }
+        .loader-ring { width: 55px; height: 55px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--white); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Spinner */
-    #loader { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; }
-    .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #6c33f2; border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* SIDEBAR & HEADER */
+        .header { background: var(--navy); padding: 16px 20px; display: flex; align-items: center; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .menu-btn { font-size: 26px; margin-right: 15px; cursor: pointer; display: flex; align-items: center; }
+        #sidebar { position: fixed; left: -300px; top: 0; width: 280px; height: 100%; background: var(--white); box-shadow: 10px 0 30px rgba(0,0,0,0.15); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; }
+        .side-head { background: var(--navy); padding: 40px 25px; color: white; position: relative; }
+        .nav-link { padding: 18px 25px; border-bottom: 1px solid #f0f0f0; font-weight: 600; color: #555; text-decoration: none; display: flex; align-items: center; gap: 15px; }
+        .nav-link i { color: var(--navy); width: 20px; font-size: 18px; }
 
-    /* Error Modal */
-    .error-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 20px; }
-    .error-modal { background: white; border-radius: 30px; width: 100%; max-width: 340px; padding: 40px 20px; text-align: center; }
-    .btn-retry { background: #6c33f2; color: white; width: 100%; padding: 18px; border-radius: 18px; font-weight: 800; border: none; font-size: 18px; margin-top: 25px; cursor: pointer; }
+        /* PAGES & CARDS */
+        .page { display: none; padding: 20px; animation: fadeInUp 0.4s ease; }
+        .active-page { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--white); border-radius: 12px; padding: 22px; border: 1px solid var(--border); margin-bottom: 18px; }
+        .btn-navy { background: var(--navy); color: white; border: none; width: 100%; padding: 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; }
+        input { width: 100%; padding: 15px; border: 1.5px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        
+        /* DATA ROWS */
+        .res-item { border-bottom: 1px solid #f5f5f5; padding: 12px 0; display: flex; align-items: center; gap: 12px; }
+        .res-label { font-size: 9px; color: #999; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .res-val { font-size: 15px; color: #333; font-weight: 700; }
+        .back-bar { display: flex; align-items: center; margin-bottom: 15px; color: var(--navy); font-weight: 800; gap: 8px; cursor: pointer; font-size: 13px; }
+    </style>
+</head>
+<body>
 
-    /* BIG SIGNATURE - All Dark */
-    .sig-area { margin-top: 30px; padding-top: 25px; border-top: 2px solid #f1f5f9; color: #000; }
-    .sig-main { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
-    .sig-line { font-size: 19px; font-weight: 800; margin-bottom: 3px; }
+    <div id="error-msg">ERROR</div>
 
-    /* Crash State */
-    .is-crashed { filter: blur(10px); opacity: 0.4; pointer-events: none; }
-</style></head><body>
-
-    <div id="app-body" class="app-viewport is-crashed">
-        <div id="p1" class="app-part balance-box">
-            <p class="text-gray-400 text-sm mb-2">היתרה שלך</p>
-            <div class="balance-amount"><span class="currency-symbol">₪</span>389</div>
-        </div>
-
-        <div id="p2" class="app-part actions-grid">
-            <div class="action-circle bg-[#f62d5d]">↗</div>
-            <div class="action-circle bg-[#00e0ff]">↙</div>
-            <div class="action-circle bg-white border border-gray-100 text-gray-200">...</div>
-        </div>
-
-        <div id="p3" class="app-part activity-card">
-            <div class="flex justify-between items-center mb-6 text-gray-300 text-xs font-bold">
-                📁 <span>פעילויות אחרונה</span>
+    <div class="modal-overlay" id="keyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <i class="fa-solid fa-xmark close-x" onclick="closeModal()"></i>
+                <i class="fa-solid fa-key" style="font-size: 35px;"></i>
+                <div style="margin-top:10px; font-weight: 900;">RESTRICTED DATABASE</div>
             </div>
-            <div class="trans-row">
-                <span class="text-red-500 font-bold">- ₪33</span>
-                <div class="text-right flex-1 px-3"><p class="font-bold text-sm">טל ציון</p></div>
-                <div class="w-10 h-10 bg-gray-100 rounded-full"></div>
-            </div>
-            <div class="trans-row">
-                <span class="text-green-600 font-bold">+ ₪190</span>
-                <div class="text-right flex-1 px-3"><p class="font-bold text-sm">שובל חזן</p></div>
-                <div class="w-10 h-10 bg-gray-100 rounded-full"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="loader"><div class="spinner"></div></div>
-
-    <div id="error-screen" class="error-overlay">
-        <div class="error-modal">
-            <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">!</div>
-            
-            <h2 class="text-2xl font-black mb-2">שגיאת מערכת קריטית</h2>
-            <p class="text-sm text-gray-500 leading-tight mb-4 font-bold">
-                החיבור לשרת המרכזי הופסק. הגישה למסד הנתונים חסומה. כשל במערכת (503).
-            </p>
-            <p class="text-[10px] font-mono text-gray-300 uppercase tracking-tighter mb-4">
-                Error_Fatal: ISR_Central_Node_Dropped
-            </p>
-            
-            <button class="btn-retry" onclick="nextStep()">נסה שוב</button>
-
-            <div class="sig-area">
-                <p class="sig-main">BY C9 UZAIR</p>
-                <p class="sig-line">Pakistan Zindabad 🇵🇰</p>
-                <p class="sig-line">Stand With Iran 🇮🇷</p>
+            <div style="padding: 30px; text-align: center;">
+                <p style="font-size:13px; color:#666">Purchase License Key From Admin</p>
+                <div style="margin: 10px 0 20px; background: #f0f4ff; padding: 10px; border-radius: 8px;">
+                    <b style="color:var(--navy)">C9 UZAIR</b><br>
+                    <a href="tel:03221287976" style="text-decoration:none; font-weight:800; color:var(--f-blue)">03221287976</a>
+                </div>
+                <input type="text" id="dbKey" style="text-align:center; margin-bottom:15px;" placeholder="ENTER KEY HERE">
+                <button class="btn-navy" onclick="verifyKey()">VERIFY ACCESS</button>
             </div>
         </div>
     </div>
 
-<script>
-    let currentStep = 0;
+    <div id="splash">
+        <div class="loader-ring"></div>
+        <div id="pct-text" style="color:white; margin-top:20px; font-weight:900; font-size:24px;">0%</div>
+        <div id="status-text" style="color:rgba(255,255,255,0.5); font-size:11px; margin-top:8px; letter-spacing:1px">LOADING DATABASE...</div>
+    </div>
 
-    function nextStep() {
-        const errorScreen = document.getElementById('error-screen');
-        const loader = document.getElementById('loader');
-        const appBody = document.getElementById('app-body');
+    <div id="sidebar">
+        <div class="side-head">
+            <i class="fa-solid fa-xmark" style="position:absolute; right:20px; top:20px; font-size:24px; cursor:pointer;" onclick="toggleSidebar()"></i>
+            <div style="font-size:10px; font-weight:800; opacity:0.7">MASTER CONTROL</div>
+            <div style="font-size:22px; font-weight:900; margin-top:5px">C9 UZAIR</div>
+        </div>
+        <a href="#" class="nav-link" onclick="navigate('home', 'DASHBOARD')"><i class="fa-solid fa-house-user"></i> Dashboard</a>
+        <a href="#" class="nav-link" onclick="window.location.href='https://wa.me/923221287976'"><i class="fa-solid fa-comments"></i> Admin Support</a>
+        <a href="#" class="nav-link" onclick="window.location.href='https://whatsapp.com/channel/0029VbBlWD0EKyZNFSYWek45'"><i class="fa-solid fa-bullhorn"></i> Join Channel</a>
+        <a href="#" class="nav-link" style="color:var(--danger)" onclick="location.reload()"><i class="fa-solid fa-power-off"></i> Exit System</a>
+    </div>
 
-        errorScreen.style.display = 'none';
-        loader.style.display = 'block';
+    <div class="header" id="main-header" style="display:none">
+        <div class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
+        <div style="font-weight:900; font-size:14px; letter-spacing:1px">C9 UZAIR SIM DATABASE 2026</div>
+    </div>
 
-        setTimeout(() => {
-            loader.style.display = 'none';
-            appBody.classList.remove('is-crashed');
-            currentStep++;
+    <div id="page-disclaimer" class="page active-page" style="margin-top:60px">
+        <div class="card" style="text-align:center">
+            <i class="fa-solid fa-id-card-clip" style="font-size:50px; color:var(--navy); margin-bottom:15px"></i>
+            <h2 style="margin:0; font-weight:900">Database Access</h2>
+            <p style="font-size:14px; color:#666; margin:10px 0 25px">C9 Team Sim Database 2026</p>
+            <button class="btn-navy" onclick="navigate('home', 'TERMINAL')">Continue </button>
+        </div>
+    </div>
 
-            if(currentStep === 1) {
-                document.getElementById('p1').classList.add('show-part');
-                setTimeout(crash, 2000);
-            }
-            else if(currentStep === 2) {
-                document.getElementById('p1').classList.add('show-part');
-                document.getElementById('p2').classList.add('show-part');
-                setTimeout(crash, 2000);
-            }
-            else if(currentStep === 3) {
-                document.getElementById('p1').classList.add('show-part');
-                document.getElementById('p2').classList.add('show-part');
-                document.getElementById('p3').classList.add('show-part');
-                setTimeout(() => {
-                    crash();
-                    currentStep = 0; 
-                    resetUI();
-                }, 3500);
-            }
-        }, 1500);
-    }
+    <div id="page-home" class="page">
+        <div class="card">
+            <div style="margin-bottom:12px; font-weight:800; font-size:11px; color:#999">RECORD SEARCH</div>
+            <input type="number" id="targetNum" placeholder="03XXXXXXXXX">
+            <button class="btn-navy" onclick="searchCheck()" style="margin-top:15px">
+                <i class="fa-solid fa-magnifying-glass"></i> RUN SEARCH
+            </button>
+        </div>
 
-    function crash() {
-        document.getElementById('app-body').classList.add('is-crashed');
-        document.getElementById('error-screen').style.display = 'flex';
-    }
+        <div id="results" style="display:none">
+            <div class="card" style="border-left: 6px solid var(--success)">
+                <div style="color:var(--success); font-weight:900; font-size:12px; margin-bottom:15px">USER IDENTIFIED ✅</div>
+                <div class="res-item"><div><div class="res-label">Full Name</div><div class="res-val">Muhammad Tariq Ahmad</div></div></div>
+                <div class="res-item"><div><div class="res-label">Verified Address</div><div class="res-val">House #22-A, St 4, G-11/2, Islamabad</div></div></div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+                <div class="card" style="text-align:center" onclick="navigate('family', 'FAMILY DATA')">
+                    <i class="fa-solid fa-sitemap" style="font-size:28px; color:var(--navy)"></i>
+                    <div style="font-size:11px; font-weight:900; margin-top:8px">FAMILY TREE</div>
+                </div>
+                <div class="card" style="text-align:center" onclick="navigate('sims', 'NETWORK DATA')">
+                    <i class="fa-solid fa-tower-cell" style="font-size:28px; color:var(--navy)"></i>
+                    <div style="font-size:11px; font-weight:900; margin-top:8px">ALL SIMS</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    function resetUI() {
-        setTimeout(() => {
-            document.querySelectorAll('.app-part').forEach(el => el.classList.remove('show-part'));
-        }, 500);
-    }
-</script></body></html>
+    <div id="page-family" class="page">
+        <div class="back-bar" onclick="navigate('home', 'DASHBOARD')"><i class="fa-solid fa-chevron-left"></i> BACK TO DASHBOARD</div>
+        <div class="card">
+            <h3 style="color:var(--navy); margin:0 0 20px 0">Linked Family Records</h3>
+            <div class="res-item"><div><div class="res-label">Father</div><div class="res-val">Bashir Ahmad | 37405-1234567-1</div></div></div>
+            <div class="res-item"><div><div class="res-label">Mother</div><div class="res-val">Zubaida Begum | 37405-8877665-2</div></div></div>
+            <div class="res-item"><div><div class="res-label">Searched</div><div class="res-val">Tariq Ahmad | 37405-1122334-3</div></div></div>
+            <div class="res-item"><div><div class="res-label">Sister</div><div class="res-val">Sara Ahmad | 37405-4455667-4</div></div></div>
+            <div class="res-item"><div><div class="res-label">Wife</div><div class="res-val">Farzana Tariq | 42101-9988776-6</div></div></div>
+            <div class="res-item"><div><div class="res-label">Brother</div><div class="res-val">Sarfraz Ahmad | 37405-0099887-1</div></div></div>
+        </div>
+    </div>
+
+    <div id="page-sims" class="page">
+        <div class="back-bar" onclick="navigate('home', 'DASHBOARD')"><i class="fa-solid fa-chevron-left"></i> BACK</div>
+        <div class="card">
+            <h3 style="color:var(--navy); margin:0 0 20px 0">Network Inventory</h3>
+            <div class="res-item"><i class="fa-solid fa-signal" style="color:var(--navy)"></i><div><div class="res-label">Network: JAZZ</div><div class="res-val">0300-9876543</div></div></div>
+            <div class="res-item"><i class="fa-solid fa-signal" style="color:var(--navy)"></i><div><div class="res-label">Network: TELENOR</div><div class="res-val">0345-1234567</div></div></div>
+            <div class="res-item"><i class="fa-solid fa-signal" style="color:var(--navy)"></i><div><div class="res-label">Network: ZONG</div><div class="res-val">0312-5566778</div></div></div>
+            <div class="res-item"><i class="fa-solid fa-signal" style="color:var(--navy)"></i><div><div class="res-label">Network: UFONE</div><div class="res-val">0336-2035861</div></div></div>
+            <div class="res-item"><i class="fa-solid fa-signal" style="color:var(--navy)"></i><div><div class="res-label">Network: JAZZ (SEC)</div><div class="res-val">0301-2233445</div></div></div>
+        </div>
+    </div>
+
+    <script>
+        const KEY = "c9uzair-database-BMnfHlCduGO7Sfgkdo";
+        let sb = false;
+
+        window.onload = () => { runLoad("SYSTEM READY", 1500, () => { document.getElementById('splash').style.display='none'; }); };
+
+        function showError(t) { const e = document.getElementById('error-msg'); e.innerText = t; e.style.display='block'; setTimeout(() => e.style.display='none', 3000); }
+
+        function toggleSidebar() { const s = document.getElementById('sidebar'); s.style.left = sb ? "-300px" : "0px"; sb = !sb; }
+
+        function closeModal() { document.getElementById('keyModal').style.display = 'none'; }
+
+        function searchCheck() {
+            if(document.getElementById('targetNum').value.length < 10) { showError("⚠️ ERROR: INVALID NUMBER"); return; }
+            document.getElementById('keyModal').style.display = 'flex';
+        }
+
+        function verifyKey() {
+            if(document.getElementById('dbKey').value === KEY) {
+                closeModal();
+                runLoad("DECRYPTING...", 2000, () => {
+                    document.getElementById('splash').style.display = 'none';
+                    document.getElementById('results').style.display = 'block';
+                });
+            } else { showError("❌ DENIED: INVALID KEY"); }
+        }
+
+        function runLoad(text, dur, cb) {
+            const s = document.getElementById('splash'), p = document.getElementById('pct-text'), st = document.getElementById('status-text');
+            s.style.display = 'flex'; st.innerText = text;
+            let current = 0;
+            const timer = setInterval(() => {
+                current += 2;
+                p.innerText = current + "%";
+                if(current >= 100) { clearInterval(timer); setTimeout(cb, 300); }
+            }, dur / 50);
+        }
+
+        function navigate(id, name) {
+            if(sb) toggleSidebar();
+            runLoad("SYNCING " + name + "...", 1000, () => {
+                document.getElementById('splash').style.display = 'none';
+                document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active-page'));
+                document.getElementById('page-' + id).classList.add('active-page');
+                document.getElementById('main-header').style.display = (id==='disclaimer') ? 'none' : 'flex';
+                window.scrollTo(0,0);
+            });
+        }
+    </script>
+</body>
+</html>
