@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>C9 UZAIR News Hack</title>
+    <title>C9 UZAIR News Hack Live</title>
     
     <style>
-        /* === 2. STYLE.CSS (Design) === */
+        /* DESIGN */
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
@@ -18,7 +18,7 @@
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             object-fit: cover; z-index: 1;
-            transform: scaleX(-1); /* Mirror effect for front camera */
+            transform: scaleX(-1); /* Mirror effect */
         }
 
         #ui-layer {
@@ -32,25 +32,30 @@
             touch-action: none;
             user-select: none;
             display: inline-block;
+            /* Border hataya taake real lage */
+            border: none;
         }
 
+        /* Default Positions */
         #logo-overlay { top: 20px; right: 20px; width: 120px; }
-        #headline-overlay { bottom: 60px; left: 50px; width: 85%; }
+        #headline-overlay { bottom: 60px; left: 20px; width: 90%; }
 
         .overlay-img {
             width: 100%; height: auto;
             display: block;
-            pointer-events: none; /* Takay dragging mein masla na ho */
+            pointer-events: none; 
         }
 
-        /* Resizer Handle (Corner pe touch point) */
+        /* Invisible Resizer Handle */
         .resizer {
-            width: 25px; height: 25px;
-            background: rgba(0, 255, 0, 0.5); /* Green dot for resizing */
-            position: absolute; right: 0; bottom: 0;
+            width: 40px; /* Thora bara rakha hai taake touch karne mein asani ho */
+            height: 40px;
+            background: transparent; /* Bilkul gayab */
+            position: absolute; 
+            right: 0; 
+            bottom: 0;
             cursor: nwse-resize;
-            border-radius: 50%;
-            border: 2px solid white;
+            z-index: 10;
         }
     </style>
 </head>
@@ -75,10 +80,10 @@
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 
     <script>
-        /* === 3. SCRIPT.JS (Logic) === */
+        /* LOGIC */
         const video = document.getElementById('video');
 
-        // Start Front Camera
+        // Front Camera Start
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -87,12 +92,12 @@
                 });
                 video.srcObject = stream;
             } catch (err) {
-                alert("Camera Permission Denied! Please use HTTPS and allow camera.");
+                alert("Camera Error: Please use HTTPS and Allow Camera Permissions.");
             }
         }
         startCamera();
 
-        // Interaction Logic
+        // Interaction Logic (Drag and Resize)
         interact('.overlay-container')
           .draggable({
             listeners: {
