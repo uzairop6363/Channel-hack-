@@ -3,129 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>C9 UZAIR News Hack Live</title>
-    
+    <title>Master Control Room - Live Merger</title>
     <style>
-        /* DESIGN */
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            overflow: hidden; background: #000;
-        }
-
-        /* Front Camera Layer */
-        #video {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover; z-index: 1;
-            transform: scaleX(-1); /* Mirror effect */
-        }
-
-        #ui-layer {
-            position: relative; z-index: 2;
-            width: 100%; height: 100%;
-        }
-
-        /* Draggable & Resizable Elements */
-        .overlay-container {
-            position: absolute;
-            touch-action: none;
-            user-select: none;
-            display: inline-block;
-            /* Border hataya taake real lage */
-            border: none;
-        }
-
-        /* Default Positions */
-        #logo-overlay { top: 20px; right: 20px; width: 120px; }
-        #headline-overlay { bottom: 60px; left: 20px; width: 90%; }
-
-        .overlay-img {
-            width: 100%; height: auto;
-            display: block;
-            pointer-events: none; 
-        }
-
-        /* Invisible Resizer Handle */
-        .resizer {
-            width: 40px; /* Thora bara rakha hai taake touch karne mein asani ho */
-            height: 40px;
-            background: transparent; /* Bilkul gayab */
-            position: absolute; 
-            right: 0; 
-            bottom: 0;
-            cursor: nwse-resize;
-            z-index: 10;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #video-hidden { display: none; } /* Hidden raw camera */
+        #render-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #ui-layer { position: relative; z-index: 2; width: 100%; height: 100%; }
+        .overlay-container { position: absolute; touch-action: none; cursor: move; }
+        .overlay-img { width: 100%; height: auto; pointer-events: none; }
+        #status { position: absolute; top: 10px; left: 10px; z-index: 100; color: #0f0; background: rgba(0,0,0,0.7); padding: 5px; font-family: monospace; }
     </style>
 </head>
 <body>
 
-    <video id="video" autoplay playsinline></video>
+    <div id="status">LIVE ID: <span id="peer-id">Connecting...</span></div>
+    
+    <video id="video-hidden" autoplay playsinline muted></video>
+    <canvas id="render-canvas"></canvas>
 
     <div id="ui-layer">
-        
-        <div class="overlay-container" id="logo-overlay">
-            <img src="IMG_4072.png" alt="Logo" class="overlay-img">
-            <div class="resizer"></div>
+        <div class="overlay-container" id="logo-overlay" style="top:20px; right:20px; width:120px;">
+            <img src="IMG_4072.png" class="overlay-img">
         </div>
-
-        <div class="overlay-container" id="headline-overlay">
-            <img src="IMG_4070.png" alt="Headline" class="overlay-img">
-            <div class="resizer"></div>
+        <div class="overlay-container" id="headline-overlay" style="bottom:60px; left:20px; width:90%;">
+            <img src="IMG_4070.png" class="overlay-img">
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
-        /* LOGIC */
-        const video = document.getElementById('video');
+        const video = document.getElementById('video-hidden');
+        const canvas = document.getElementById('render-canvas');
+        const ctx = canvas.getContext('2d');
+        const peer = new Peer('uzair-news-studio');
 
-        // Front Camera Start
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" }, 
-                    audio: false 
+        peer.on('open', id => document.getElementById('peer-id').innerText = id);
+
+        async function init() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
+            video.srcObject = stream;
+
+            // Canvas size setup
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Draw everything on canvas (Camera + Overlays)
+            function draw() {
+                // 1. Draw Camera (Mirrored)
+                ctx.save();
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                // 2. Draw Overlays
+                const overlays = document.querySelectorAll('.overlay-container');
+                overlays.forEach(div => {
+                    const img = div.querySelector('img');
+                    const rect = div.getBoundingClientRect();
+                    ctx.drawImage(img, rect.left, rect.top, rect.width, rect.height);
                 });
-                video.srcObject = stream;
-            } catch (err) {
-                alert("Camera Error: Please use HTTPS and Allow Camera Permissions.");
+
+                requestAnimationFrame(draw);
             }
+            draw();
+
+            // Stream the Canvas instead of just the camera
+            const canvasStream = canvas.captureStream(30); // 30 FPS
+            
+            peer.on('call', call => {
+                call.answer(canvasStream);
+            });
         }
-        startCamera();
 
-        // Interaction Logic (Drag and Resize)
-        interact('.overlay-container')
-          .draggable({
-            listeners: {
-              move (event) {
-                var target = event.target;
-                var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        init();
 
+        // Drag & Resize
+        interact('.overlay-container').draggable({
+            listeners: { move(event) {
+                let target = event.target;
+                let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
                 target.style.transform = `translate(${x}px, ${y}px)`;
                 target.setAttribute('data-x', x);
                 target.setAttribute('data-y', y);
-              }
-            }
-          })
-          .resizable({
-            edges: { right: true, bottom: true },
-            listeners: {
-              move (event) {
-                var target = event.target;
-                var x = (parseFloat(target.getAttribute('data-x')) || 0);
-                var y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-                target.style.width = event.rect.width + 'px';
-                target.style.height = event.rect.height + 'px';
-                target.style.transform = `translate(${x}px, ${y}px)`;
-              }
-            }
-          });
+            }}
+        });
     </script>
 </body>
 </html>
