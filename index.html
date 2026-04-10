@@ -3,98 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MCR - Broadcaster</title>
+    <title>C9 UZAIR News Hack Live</title>
+    
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-        #video-hidden { display: none; } 
-        #render-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        #ui-layer { position: relative; z-index: 2; width: 100%; height: 100%; }
-        .draggable { position: absolute; touch-action: none; cursor: move; }
-        .draggable img { width: 100%; height: auto; pointer-events: none; }
-        #status { position: absolute; top: 10px; left: 10px; z-index: 100; color: #0f0; background: rgba(0,0,0,0.8); padding: 8px; font-family: monospace; border-radius: 5px; font-size: 10px; }
+        /* DESIGN */
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; background: #000;
+        }
+
+        /* Front Camera Layer */
+        #video {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; z-index: 1;
+            transform: scaleX(-1); /* Mirror effect */
+        }
+
+        #ui-layer {
+            position: relative; z-index: 2;
+            width: 100%; height: 100%;
+        }
+
+        /* Draggable & Resizable Elements */
+        .overlay-container {
+            position: absolute;
+            touch-action: none;
+            user-select: none;
+            display: inline-block;
+            /* Border hataya taake real lage */
+            border: none;
+        }
+
+        /* Default Positions */
+        #logo-overlay { top: 20px; right: 20px; width: 120px; }
+        #headline-overlay { bottom: 60px; left: 20px; width: 90%; }
+
+        .overlay-img {
+            width: 100%; height: auto;
+            display: block;
+            pointer-events: none; 
+        }
+
+        /* Invisible Resizer Handle */
+        .resizer {
+            width: 40px; /* Thora bara rakha hai taake touch karne mein asani ho */
+            height: 40px;
+            background: transparent; /* Bilkul gayab */
+            position: absolute; 
+            right: 0; 
+            bottom: 0;
+            cursor: nwse-resize;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
 
-    <div id="status">STUDIO ID: <span id="peer-id">Wait...</span></div>
-    
-    <video id="video-hidden" autoplay playsinline muted></video>
-    <canvas id="render-canvas"></canvas>
+    <video id="video" autoplay playsinline></video>
 
     <div id="ui-layer">
-        <div class="draggable" id="logo-overlay" style="top:20px; right:20px; width:120px;">
-            <img src="IMG_4072.png">
+        
+        <div class="overlay-container" id="logo-overlay">
+            <img src="logo.png" alt="Logo" class="overlay-img">
+            <div class="resizer"></div>
         </div>
-        <div class="draggable" id="headline-overlay" style="bottom:60px; left:20px; width:90%;">
-            <img src="IMG_4070.png">
+
+        <div class="overlay-container" id="headline-overlay">
+            <img src="headline.png" alt="Headline" class="overlay-img">
+            <div class="resizer"></div>
         </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
-        const video = document.getElementById('video-hidden');
-        const canvas = document.getElementById('render-canvas');
-        const ctx = canvas.getContext('2d');
-        const peer = new Peer('uzair-studio-live'); 
+        /* LOGIC */
+        const video = document.getElementById('video');
 
-        peer.on('open', id => {
-            document.getElementById('peer-id').innerText = id;
-            startCamera();
-        });
-
+        // Front Camera Start
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: 480, height: 360 }, 
-                    audio: true 
+                    video: { facingMode: "user" }, 
+                    audio: false 
                 });
                 video.srcObject = stream;
-                video.onloadedmetadata = () => {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                    renderLoop();
-                    
-                    const canvasStream = canvas.captureStream(20); 
-                    const audioTracks = stream.getAudioTracks();
-                    if (audioTracks.length > 0) canvasStream.addTrack(audioTracks[0]);
-
-                    peer.on('call', call => {
-                        call.answer(canvasStream);
-                    });
-                };
             } catch (err) {
-                alert("Camera Error: " + err.name);
+                alert("Camera Error: Please use HTTPS and Allow Camera Permissions.");
             }
         }
+        startCamera();
 
-        function renderLoop() {
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            ctx.restore();
+        // Interaction Logic (Drag and Resize)
+        interact('.overlay-container')
+          .draggable({
+            listeners: {
+              move (event) {
+                var target = event.target;
+                var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-            document.querySelectorAll('.draggable').forEach(div => {
-                const img = div.querySelector('img');
-                const rect = div.getBoundingClientRect();
-                if (img.complete && img.naturalWidth !== 0) {
-                    ctx.drawImage(img, rect.left, rect.top, rect.width, rect.height);
-                }
-            });
-            requestAnimationFrame(renderLoop);
-        }
+                target.style.transform = `translate(${x}px, ${y}px)`;
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
+              }
+            }
+          })
+          .resizable({
+            edges: { right: true, bottom: true },
+            listeners: {
+              move (event) {
+                var target = event.target;
+                var x = (parseFloat(target.getAttribute('data-x')) || 0);
+                var y = (parseFloat(target.getAttribute('data-y')) || 0);
 
-        interact('.draggable').draggable({
-            listeners: { move(event) {
-                let t = event.target;
-                let x = (parseFloat(t.getAttribute('data-x')) || 0) + event.dx;
-                let y = (parseFloat(t.getAttribute('data-y')) || 0) + event.dy;
-                t.style.transform = `translate(${x}px, ${y}px)`;
-                t.setAttribute('data-x', x);
-                t.setAttribute('data-y', y);
-            }}
-        });
+                target.style.width = event.rect.width + 'px';
+                target.style.height = event.rect.height + 'px';
+                target.style.transform = `translate(${x}px, ${y}px)`;
+              }
+            }
+          });
     </script>
 </body>
 </html>
