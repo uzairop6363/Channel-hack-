@@ -11,12 +11,12 @@
         #ui-layer { position: relative; z-index: 2; width: 100%; height: 100%; }
         .draggable { position: absolute; touch-action: none; cursor: move; }
         .draggable img { width: 100%; height: auto; pointer-events: none; }
-        #status { position: absolute; top: 10px; left: 10px; z-index: 100; color: #0f0; background: rgba(0,0,0,0.8); padding: 8px; font-family: monospace; border-radius: 5px; }
+        #status { position: absolute; top: 10px; left: 10px; z-index: 100; color: #0f0; background: rgba(0,0,0,0.8); padding: 8px; font-family: monospace; border-radius: 5px; font-size: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="status">STUDIO ID: <span id="peer-id">Connecting...</span></div>
+    <div id="status">STUDIO ID: <span id="peer-id">Wait...</span></div>
     
     <video id="video-hidden" autoplay playsinline muted></video>
     <canvas id="render-canvas"></canvas>
@@ -37,67 +37,62 @@
         const video = document.getElementById('video-hidden');
         const canvas = document.getElementById('render-canvas');
         const ctx = canvas.getContext('2d');
-        
-        // Use a unique but fixed ID for your studio
-        const peer = new Peer('uzair-news-studio-123'); 
+        const peer = new Peer('uzair-studio-live'); 
 
         peer.on('open', id => {
             document.getElementById('peer-id').innerText = id;
-            init();
+            startCamera();
         });
 
-        async function init() {
+        async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: 640, height: 480 }, // Lower resolution for stability
+                    video: { facingMode: "user", width: 480, height: 360 }, 
                     audio: true 
                 });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     canvas.width = window.innerWidth;
                     canvas.height = window.innerHeight;
-                    draw();
+                    renderLoop();
                     
-                    const canvasStream = canvas.captureStream(25); 
-                    // Add audio to the canvas stream
-                    const audioTrack = stream.getAudioTracks()[0];
-                    if (audioTrack) canvasStream.addTrack(audioTrack);
+                    const canvasStream = canvas.captureStream(20); 
+                    const audioTracks = stream.getAudioTracks();
+                    if (audioTracks.length > 0) canvasStream.addTrack(audioTracks[0]);
 
                     peer.on('call', call => {
-                        console.log("Receiving call...");
                         call.answer(canvasStream);
                     });
                 };
             } catch (err) {
-                alert("Camera Stuck/Error: " + err.message);
+                alert("Camera Error: " + err.name);
             }
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Draw Mirrored Camera
+        function renderLoop() {
             ctx.save();
             ctx.scale(-1, 1);
             ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
             ctx.restore();
 
-            // Draw Overlays
             document.querySelectorAll('.draggable').forEach(div => {
                 const img = div.querySelector('img');
                 const rect = div.getBoundingClientRect();
-                ctx.drawImage(img, rect.left, rect.top, rect.width, rect.height);
+                if (img.complete && img.naturalWidth !== 0) {
+                    ctx.drawImage(img, rect.left, rect.top, rect.width, rect.height);
+                }
             });
-            requestAnimationFrame(draw);
+            requestAnimationFrame(renderLoop);
         }
 
         interact('.draggable').draggable({
             listeners: { move(event) {
-                let target = event.target;
-                let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-                target.style.transform = `translate(${x}px, ${y}px)`;
-                target.setAttribute('data-x', x);
-                target.setAttribute('data-y', y);
+                let t = event.target;
+                let x = (parseFloat(t.getAttribute('data-x')) || 0) + event.dx;
+                let y = (parseFloat(t.getAttribute('data-y')) || 0) + event.dy;
+                t.style.transform = `translate(${x}px, ${y}px)`;
+                t.setAttribute('data-x', x);
+                t.setAttribute('data-y', y);
             }}
         });
     </script>
