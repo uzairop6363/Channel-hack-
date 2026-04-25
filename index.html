@@ -3,129 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>C9 UZAIR News Hack Live</title>
-    
+    <title>News MCR Control Panel</title>
     <style>
-        /* DESIGN */
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            overflow: hidden; background: #000;
+        /* Base Reset & iPad Optimization */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Prevents accidental text selection while swiping */
+        }
+        
+        body {
+            background-color: #0a0a0c;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Prevent body scroll, handle scroll in containers */
+            display: flex;
         }
 
-        /* Front Camera Layer */
-        #video {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover; z-index: 1;
-            transform: scaleX(-1); /* Mirror effect */
+        /* Sidebar Styling - Scrollable */
+        .sidebar {
+            width: 280px;
+            background: #151518;
+            border-right: 2px solid #2a2a35;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll for iPad */
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            z-index: 100;
         }
 
-        #ui-layer {
-            position: relative; z-index: 2;
-            width: 100%; height: 100%;
+        .brand {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
         }
 
-        /* Draggable & Resizable Elements */
-        .overlay-container {
+        /* Main Workspace */
+        .workspace {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Video Screens Layout */
+        .screens-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 4px solid #cc0000;
+            box-shadow: 0 0 20px rgba(204, 0, 0, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Program (Live) Screen */
+        #live-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #050505;
+        }
+
+        /* Preview (Small) Screen inside Program */
+        .preview-container {
             position: absolute;
-            touch-action: none;
-            user-select: none;
-            display: inline-block;
-            /* Border hataya taake real lage */
-            border: none;
-        }
-
-        /* Default Positions */
-        #logo-overlay { top: 20px; right: 20px; width: 120px; }
-        #headline-overlay { bottom: 60px; left: 20px; width: 90%; }
-
-        .overlay-img {
-            width: 100%; height: auto;
-            display: block;
-            pointer-events: none; 
-        }
-
-        /* Invisible Resizer Handle */
-        .resizer {
-            width: 40px; /* Thora bara rakha hai taake touch karne mein asani ho */
-            height: 40px;
-            background: transparent; /* Bilkul gayab */
-            position: absolute; 
-            right: 0; 
-            bottom: 0;
-            cursor: nwse-resize;
+            bottom: 20px;
+            right: 20px;
+            width: 28%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 3px solid #00cc00;
+            box-shadow: 0 0 15px rgba(0, 204, 0, 0.6);
+            border-radius: 4px;
             z-index: 10;
+            overflow: hidden;
+        }
+
+        #preview-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Labels */
+        .screen-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            z-index: 20;
+            letter-spacing: 1px;
+        }
+        .live-label { color: #ff3333; }
+        .pvw-label { color: #33ff33; font-size: 10px; }
+
+        /* Buttons Styling */
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group h4 {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #252530;
+            color: #fff;
+            border: 1px solid #3a3a45;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.96);
+            background: #3a3a45;
+        }
+
+        /* Functional Buttons */
+        .btn-add {
+            background: #1976d2;
+            border-color: #1565c0;
+        }
+        .btn-push {
+            background: #d32f2f;
+            border-color: #b71c1c;
+            font-size: 18px;
+            padding: 16px;
+            margin-top: 10px;
+            box-shadow: 0 4px 0 #9a0000;
+        }
+        .btn-push:active {
+            box-shadow: 0 0 0 #9a0000;
+            transform: translateY(4px);
+        }
+
+        /* File Input Hidden */
+        #video-upload {
+            display: none;
+        }
+
+        /* Dummy Buttons (Professional MCR Look) */
+        .dummy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .btn-dummy {
+            font-size: 11px;
+            padding: 10px 5px;
+            background: #1e1e24;
+            color: #aaa;
+            border: 1px solid #333;
+        }
+        .btn-dummy:active { background: #4caf50; color: white; }
+
+        /* Responsive behavior */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #2a2a35; flex-direction: row; flex-wrap: wrap; justify-content: space-between;}
+            .control-group { width: 48%; }
+            .workspace { padding: 10px; }
+            .btn-push { font-size: 16px; padding: 12px; }
         }
     </style>
 </head>
 <body>
 
-    <video id="video" autoplay playsinline></video>
+    <aside class="sidebar">
+        <div class="brand">MASTER CONTROL</div>
 
-    <div id="ui-layer">
+        <div class="control-group">
+            <h4>Media Ingestion</h4>
+            <input type="file" id="video-upload" accept="video/*">
+            <button class="btn-add" id="add-video-btn">⏏ LOAD VIDEO (PVW)</button>
+        </div>
+
+        <div class="control-group">
+            <h4>Broadcast Control</h4>
+            <button class="btn-push" id="push-btn">🔴 PUSH TO LIVE</button>
+        </div>
+
+        <div class="control-group">
+            <h4>Video Switcher (Dummy)</h4>
+            <div class="dummy-grid">
+                <button class="btn-dummy">CAM 1</button>
+                <button class="btn-dummy">CAM 2</button>
+                <button class="btn-dummy">SAT LINK 1</button>
+                <button class="btn-dummy">SAT LINK 2</button>
+                <button class="btn-dummy">CG IN</button>
+                <button class="btn-dummy">GFX OVERLAY</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h4>Audio Mixer (Dummy)</h4>
+            <div class="dummy-grid">
+                <button class="btn-dummy">MIC CH 1</button>
+                <button class="btn-dummy">MIC CH 2</button>
+                <button class="btn-dummy">STUDIO MUTE</button>
+                <button class="btn-dummy">AUDIO AFV</button>
+            </div>
+        </div>
         
-        <div class="overlay-container" id="logo-overlay">
-            <img src="IMG_4072.png" alt="Logo" class="overlay-img">
-            <div class="resizer"></div>
+        <div class="control-group">
+            <h4>Transmission (Dummy)</h4>
+            <button class="btn-dummy" style="width: 100%;">TICKER UPDATE</button>
+            <button class="btn-dummy" style="width: 100%;">DVE EFFECT</button>
         </div>
+    </aside>
 
-        <div class="overlay-container" id="headline-overlay">
-            <img src="IMG_4070.png" alt="Headline" class="overlay-img">
-            <div class="resizer"></div>
+    <main class="workspace">
+        <div class="screens-wrapper">
+            <div class="screen-label live-label">PGM - ON AIR</div>
+            <video id="live-video" playsinline></video>
+
+            <div class="preview-container">
+                <div class="screen-label pvw-label">PVW - READY</div>
+                <video id="preview-video" muted loop playsinline></video>
+            </div>
         </div>
-
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    </main>
 
     <script>
-        /* LOGIC */
-        const video = document.getElementById('video');
+        const fileInput = document.getElementById('video-upload');
+        const addVideoBtn = document.getElementById('add-video-btn');
+        const pushBtn = document.getElementById('push-btn');
+        
+        const previewVideo = document.getElementById('preview-video');
+        const liveVideo = document.getElementById('live-video');
+        
+        let currentVideoURL = null;
 
-        // Front Camera Start
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" }, 
-                    audio: false 
-                });
-                video.srcObject = stream;
-            } catch (err) {
-                alert("Camera Error: Please use HTTPS and Allow Camera Permissions.");
+        // 1. Trigger File Selection
+        addVideoBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 2. Load Video into PVW (Preview)
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Free up memory if a video is already loaded
+                if (currentVideoURL) {
+                    URL.revokeObjectURL(currentVideoURL);
+                }
+                
+                // Create local fast-access URL
+                currentVideoURL = URL.createObjectURL(file);
+                
+                // Set and play on small screen
+                previewVideo.src = currentVideoURL;
+                previewVideo.play().catch(e => console.log("Auto-play prevented on Preview: ", e));
             }
-        }
-        startCamera();
+            // Reset input so same file can be selected again if needed
+            this.value = ''; 
+        });
 
-        // Interaction Logic (Drag and Resize)
-        interact('.overlay-container')
-          .draggable({
-            listeners: {
-              move (event) {
-                var target = event.target;
-                var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-                target.style.transform = `translate(${x}px, ${y}px)`;
-                target.setAttribute('data-x', x);
-                target.setAttribute('data-y', y);
-              }
+        // 3. PUSH to Live (PGM) Logic
+        pushBtn.addEventListener('click', () => {
+            if (currentVideoURL) {
+                // Sync the Live screen with the exact moment the Preview screen is at
+                const currentTime = previewVideo.currentTime;
+                
+                liveVideo.src = currentVideoURL;
+                liveVideo.currentTime = currentTime;
+                
+                // Play live screen
+                liveVideo.play().catch(e => console.log("Play prevented on Live: ", e));
+                
+                // Optional: Mute preview when pushed to live so audio doesn't overlap
+                // liveVideo has volume, preview is already muted via HTML attribute.
+            } else {
+                alert("Please load a video into PVW first!");
             }
-          })
-          .resizable({
-            edges: { right: true, bottom: true },
-            listeners: {
-              move (event) {
-                var target = event.target;
-                var x = (parseFloat(target.getAttribute('data-x')) || 0);
-                var y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-                target.style.width = event.rect.width + 'px';
-                target.style.height = event.rect.height + 'px';
-                target.style.transform = `translate(${x}px, ${y}px)`;
-              }
-            }
-          });
+        });
     </script>
 </body>
 </html>
